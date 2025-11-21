@@ -1,7 +1,9 @@
-// api/client.js - COMPLETELY FIXED version
+// api/client.js
 import axios from 'axios';
 
-const API_BASE_URL = 'http://127.0.0.1:8000/api/v1';
+// Use env variable (Vite style). Fallback to localhost for dev.
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api/v1';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -9,6 +11,7 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
 
 // Helper function to clear all auth data from both storage types
 const clearAuthData = () => {
