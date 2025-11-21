@@ -1,0 +1,387 @@
+/* ---------- Reset ---------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ---------- Theme variables ---------- */
+:root {
+  --primary: #6B21A8;
+  --primary-dark: #581C87;
+  --primary-light: #8B5CF6;
+  --secondary: #06D6A0;
+  --accent: #FF6B6B;
+  --background: #0F0F23;
+  --surface: #1A1A2E;
+  --card: #252542;
+  --text-primary: #FFFFFF;
+  --text-secondary: #A0A0C0;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+}
+
+/* ---------- Page layout ---------- */
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  background: var(--background); /* dark base */
+  color: var(--text-primary);
+}
+
+/* remove Vite default constraints */
+#root {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  text-align: initial;
+}
+
+/* App wrapper (no global gradient now) */
+.app {
+  min-height: 100vh;
+  background: transparent; /* sections handle their own gradients */
+}
+
+/* ---------- Scrollbar ---------- */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 3px;
+}
+
+/* ---------- Layout helpers ---------- */
+.container {
+  max-width: 428px; /* Mobile-first */
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* ---------- Glass cards ---------- */
+.glass-card {
+  background: rgba(37, 37, 66, 0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 20px;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  padding: 14px 24px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  box-shadow: 0 4px 20px rgba(107, 33, 168, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(107, 33, 168, 0.4);
+}
+
+.btn-secondary {
+  background: var(--card);
+  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ---------- Quick Action Buttons ---------- */
+.quick-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--card);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 80px;
+}
+
+.quick-action:hover {
+  transform: translateY(-4px);
+  background: rgba(107, 33, 168, 0.1);
+  border-color: var(--primary);
+}
+
+.quick-action-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+}
+
+/* ---------- Bottom Navigation ---------- */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  /* ✅ no full-width colored bar */
+  background: transparent;
+  border-top: none;
+
+  padding: 0 0 16px;
+  display: flex;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 12px;
+  transition: color 0.3s ease;
+}
+
+.nav-item.active {
+  color: var(--primary-light);
+}
+
+.nav-icon {
+  font-size: 20px;
+}
+
+/* ---------- Balance Display ---------- */
+.balance-display {
+  text-align: center;
+  padding: 30px 0;
+}
+
+.balance-amount {
+  font-size: 3rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #FFFFFF, var(--primary-light));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 10px 0;
+}
+
+/* ---------- Transactions ---------- */
+.transaction-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 16px;
+  margin-bottom: 8px;
+  transition: background 0.3s ease;
+}
+
+.transaction-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.transaction-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.transaction-credit {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--success);
+}
+
+.transaction-debit {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+
+/* ---------- Forms ---------- */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.form-input {
+  width: 100%;
+  padding: 16px;
+  background: var(--card);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary-light);
+}
+
+/* ---------- Modal ---------- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 15, 35, 0.9);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: var(--surface);
+  border-radius: 24px;
+  padding: 32px;
+  max-width: 400px;
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+/* ---------- PIN Input ---------- */
+.pin-input {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.pin-dot {
+  width: 60px;
+  height: 60px;
+  border: 2px solid var(--card);
+  border-radius: 12px;
+  background: var(--card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.pin-dot.filled {
+  border-color: var(--primary-light);
+  background: rgba(107, 33, 168, 0.1);
+}
+
+/* ---------- Loading ---------- */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  color: var(--text-secondary);
+}
+
+/* ---------- Animations ---------- */
+@keyframes scaleUp {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+  60% { transform: translateY(-5px); }
+}
+
+@keyframes confetti {
+  0% { transform: translateY(0) rotate(0); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+}
+
+.success-animation {
+  animation: scaleUp 0.5s ease;
+}
+
+.bounce-animation {
+  animation: bounce 1s infinite;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease;
+}
+
+/* ---------- Responsive ---------- */
+@media (min-width: 768px) {
+  .container {
+    max-width: 480px;
+  }
+}
+
+/* (Optional leftover Vite demo classes – safe to keep or delete) */
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+.card {
+  padding: 2em;
+}
+.read-the-docs {
+  color: #888;
+}
