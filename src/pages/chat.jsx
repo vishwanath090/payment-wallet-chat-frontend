@@ -4,6 +4,11 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getChatUsers, getChatHistory } from "../api/chat";
 import { useAuth } from "../context/AuthContext";
 
+const API_URL = import.meta.env.VITE_API_URL;
+const WS_BASE_URL = import.meta.env.VITE_WS_URL;
+
+console.log("🔧 Chat API URL:", API_URL);
+console.log("🔧 Chat WS URL:", WS_BASE_URL);
 const Chat = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -129,7 +134,7 @@ const connectWebSocket = useCallback(() => {
 
   try {
     // ✅ FIXED: Each user connects with their own unique identity
-    const wsUrl = `ws://localhost:8000/api/v1/chat/ws/${encodeURIComponent(currentUser.email)}?token=${authToken}&user_id=${currentUser.id}`;
+    const wsUrl = `${WS_BASE_URL}/${encodeURIComponent(currentUser.email)}`;
     const ws = new WebSocket(wsUrl);
     websocketRef.current = ws;
     
