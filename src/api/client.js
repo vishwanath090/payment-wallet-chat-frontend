@@ -1,146 +1,102 @@
 // api/client.js
 import axios from 'axios';
 
-// Use env variable (Vite/Production) -> fallback to localhost (Dev)
+// Use env variable (Vite) → fallback to localhost
 const API_BASE_URL =
-  import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api/v1';
+  import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api/v1";
 
 console.log("🔧 API Base URL in use:", API_BASE_URL);
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
-
-
-
-
-// Helper function to clear all auth data from both storage types
+// Clear auth data from storage
 const clearAuthData = () => {
-  // Clear sessionStorage (primary)
-  sessionStorage.removeItem("token");
-  sessionStorage.removeItem("access_token");
-  sessionStorage.removeItem("refresh_token");
-  sessionStorage.removeItem('user');
-  
-  // Clear localStorage (fallback/legacy)
-  localStorage.removeItem("token");
-  localStorage.removeItem("access_token");
-  localStorage.removeItem("refresh_token");
-  localStorage.removeItem('user');
-  
-  console.log('🔐 API Client - All auth data cleared from both storage types');
+  sessionStorage.clear();
+  localStorage.clear();
+  console.log("🔐 Auth cleared");
 };
 
-// Helper function to get token from both storage types
+// Get token from storage
 const getTokenFromStorage = () => {
-  // Check sessionStorage first (primary)
-  let token = sessionStorage.getItem("token") || sessionStorage.getItem("access_token");
-  
-  // If not found in sessionStorage, check localStorage (fallback)
-  if (!token) {
-    token = localStorage.getItem("token") || localStorage.getItem("access_token");
-    if (token) {
-      console.log('🔐 API Client - Using token from localStorage (fallback)');
-    }
-  } else {
-    console.log('🔐 API Client - Using token from sessionStorage');
-  }
-  
-  return token;
+  return (
+    sessionStorage.getItem("token") ||
+    sessionStorage.getItem("access_token") ||
+    localStorage.getItem("token") ||
+    localStorage.getItem("access_token")
+  );
 };
 
-// Request interceptor - FIXED to check both storage types
-// In client.js - Add token refresh logic
+// Response interceptor → auto refresh expired access token
 api.interceptors.response.use(
-  (response) => {
-    console.log(`✅ API Client - Response success: ${response.status} ${response.config.url}`);
-    return response;
+  (res) => {
+    console.log(`✅ API success: ${res.status} ${res.config.url}`);
+    return res;
   },
-  async (error) => {
-    const status = error.response?.status;
-    const url = error.config?.url;
-    const method = error.config?.method?.toUpperCase();
-    const backendMessage = error.response?.data?.detail;
-    
-    console.error(`❌ API Client - Response error: ${status} ${method} ${url}`);
+  async (err) => {
+    const status = err.response?.status;
+    const message = err.response?.data?.detail;
 
-    // ✅ ADD: Handle 403 "Not authenticated" errors
-    if (status === 403 && backendMessage === 'Not authenticated') {
-      console.log('🔐 API Client - Token expired or invalid, attempting refresh...');
-      
-      // Try to refresh the token
+    console.log("❌ API error:", status, message);
+
+    if (status === 403 && message === "Not authenticated") {
       try {
-        const refreshToken = sessionStorage.getItem("refresh_token") || localStorage.getItem("refresh_token");
-        
-        if (refreshToken) {
-          const refreshResponse = await axios.post(`${API_BASE_URL}/auth/refresh`, {
-            refresh_token: refreshToken
-          });
-          
-          if (refreshResponse.data.access_token) {
-            // Save new token
-            const newToken = refreshResponse.data.access_token;
-            sessionStorage.setItem("token", newToken);
-            sessionStorage.setItem("access_token", newToken);
-            localStorage.setItem("token", newToken);
-            localStorage.setItem("access_token", newToken);
-            
-            console.log('🔐 API Client - Token refreshed successfully');
-            
-            // Retry the original request with new token
-            error.config.headers.Authorization = `Bearer ${newToken}`;
-            return api.request(error.config);
-          }
-        }
+        const refreshToken =
+          sessionStorage.getItem("refresh_token") ||
+          localStorage.getItem("refresh_token");
+
+        if (!refreshToken) throw new Error("No refresh token");
+
+        // Refresh request
+        const refreshRes = await axios.post(
+          `${API_BASE_URL}/auth/refresh`,
+          { refresh_token: refreshToken }
+        );
+
+        const newToken = refreshRes.data.access_token;
+        if (!newToken) throw new Error("No new token from backend");
+
+        // Save token
+        sessionStorage.setItem("token", newToken);
+        sessionStorage.setItem("access_token", newToken);
+        localStorage.setItem("token", newToken);
+        localStorage.setItem("access_token", newToken);
+
+        // Retry original request
+        err.config.headers.Authorization = `Bearer ${newToken}`;
+        return api.request(err.config);
+
       } catch (refreshError) {
-        console.log('🔐 API Client - Token refresh failed, logging out');
+        console.log("🔐 Refresh failed → logout");
         clearAuthData();
-        if (!window.location.pathname.includes('/login')) {
-          window.location.href = '/login';
-        }
+        window.location.href = "/login";
         return Promise.reject(refreshError);
       }
     }
-    
-    // ... rest of your existing error handling
+
+    return Promise.reject(err);
   }
 );
 
-// ✅ FIXED: Enhanced user-friendly error messages
 const getUserFriendlyErrorMessage = (error) => {
   const status = error.response?.status;
-  const url = error.config?.url;
-  const backendMessage = error.response?.data?.detail;
-  
-  // Handle PIN errors specifically
-  if (error.isPinError || error.isWalletError) {
-    return backendMessage || 'Transaction failed. Please check your PIN and try again.';
-  }
-  
+  const detail = error.response?.data?.detail;
+
+  if (!status) return "Network error. Check connection.";
+
   switch (status) {
-    case 401:
-      return 'Your session has expired. Please login again.';
-    case 403:
-      return 'You do not have permission to access this resource.';
-    case 404:
-      return 'The requested resource was not found.';
-    case 500:
-      return 'Server error. Please try again later.';
-    case 400:
-      return backendMessage || 'Invalid request. Please check your input.';
-    default:
-      if (!error.response) {
-        return 'Network error. Please check your connection.';
-      }
-      return backendMessage || 'An unexpected error occurred. Please try again.';
+    case 400: return detail || "Invalid request.";
+    case 401: return "Your session expired. Please login again.";
+    case 403: return "Not authorized.";
+    case 404: return "Resource not found.";
+    case 500: return "Server error. Try again later.";
+    default: return detail || "Unexpected error occurred.";
   }
 };
 
-// Export helper functions for use in components
 export { clearAuthData, getTokenFromStorage, getUserFriendlyErrorMessage };
-
 export default api;
