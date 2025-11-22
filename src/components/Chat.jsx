@@ -5,6 +5,11 @@ import { getAllUsers } from "../api/users";
 import { getChatHistory } from "../api/chat";
 import { useLocation, useNavigate } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL;
+const WS_BASE_URL = import.meta.env.VITE_WS_URL;
+
+console.log("🔧 Chat API URL:", API_URL);
+console.log("🔧 Chat WS URL:", WS_BASE_URL);
 const Chat = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -52,8 +57,8 @@ const Chat = () => {
     }
 
     try {
-      const ws = new WebSocket(`ws://localhost:8000/api/v1/chat/ws/${encodeURIComponent(currentUser.email)}`);
-      
+      const wsUrl = `${WS_BASE_URL}/${encodeURIComponent(currentUser.email)}`;
+      const ws = new WebSocket(wsUrl);
       ws.onopen = () => {
         console.log("✅ WebSocket Connected successfully");
         setConnectionStatus("connected");

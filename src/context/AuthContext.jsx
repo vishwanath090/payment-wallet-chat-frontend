@@ -4,8 +4,8 @@ const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
-// 🔥 Correct API URL from Vite Env
-const API_URL = import.meta.env.VITE_API_URL; 
+// Use correct Vite env variable
+const API_URL = import.meta.env.VITE_API_URL;
 console.log("🔧 Using API URL:", API_URL);
 
 export const AuthProvider = ({ children }) => {
@@ -13,9 +13,9 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ---------------------------
-  // Storage Helpers
-  // ---------------------------
+  //-----------------------------
+  // Storage helpers
+  //-----------------------------
   const getToken = () =>
     sessionStorage.getItem("token") ||
     sessionStorage.getItem("access_token") ||
@@ -34,20 +34,17 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
-  const getUserData = () => {
-    return (
-      sessionStorage.getItem("user") || localStorage.getItem("user")
-    );
-  };
+  const getUserData = () =>
+    sessionStorage.getItem("user") || localStorage.getItem("user");
 
   const setUserData = (data) => {
     sessionStorage.setItem("user", JSON.stringify(data));
     localStorage.setItem("user", JSON.stringify(data));
   };
 
-  // ---------------------------
-  // Refresh User Profile
-  // ---------------------------
+  //-----------------------------
+  // Refresh user profile
+  //-----------------------------
   const refreshUser = async () => {
     try {
       const token = getToken();
@@ -57,22 +54,23 @@ export const AuthProvider = ({ children }) => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        setUserData(data);
-        setUser(data);
-        return data;
+      if (!res.ok) {
+        if (res.status === 401) logout();
+        return null;
       }
 
-      if (res.status === 401) logout();
+      const data = await res.json();
+      setUserData(data);
+      setUser(data);
+      return data;
     } catch (err) {
       console.error("Error refreshing user:", err);
     }
   };
 
-  // ---------------------------
-  // Refresh Token
-  // ---------------------------
+  //-----------------------------
+  // Refresh token
+  //-----------------------------
   const refreshToken = async () => {
     try {
       let refresh =
@@ -101,13 +99,12 @@ export const AuthProvider = ({ children }) => {
       return data.access_token;
     } catch (err) {
       logout();
-      throw err;
     }
   };
 
-  // ---------------------------
-  // LOGIN FUNCTION
-  // ---------------------------
+  //-----------------------------
+  // LOGIN
+  //-----------------------------
   const login = async (email, password) => {
     try {
       clearAuthData();
@@ -120,11 +117,10 @@ export const AuthProvider = ({ children }) => {
 
       if (!res.ok) {
         const errData = await res.json();
-        throw new Error(errData.detail || "Invalid email/password");
+        throw new Error(errData.detail || "Invalid credentials");
       }
 
       const data = await res.json();
-
       setToken(data.access_token);
 
       if (data.refresh_token) {
@@ -132,7 +128,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem("refresh_token", data.refresh_token);
       }
 
-      // Fetch profile
+      // load profile
       const profileRes = await fetch(`${API_URL}/profile/`, {
         headers: { Authorization: `Bearer ${data.access_token}` },
       });
@@ -143,29 +139,28 @@ export const AuthProvider = ({ children }) => {
 
       setUserData(profile);
       setUser(profile);
-      setIsAuthenticated(true);
 
+      setIsAuthenticated(true);
       return { success: true };
     } catch (err) {
       clearAuthData();
       setIsAuthenticated(false);
-      setUser(null);
       throw err;
     }
   };
 
-  // ---------------------------
+  //-----------------------------
   // LOGOUT
-  // ---------------------------
+  //-----------------------------
   const logout = () => {
     clearAuthData();
-    setIsAuthenticated(false);
     setUser(null);
+    setIsAuthenticated(false);
   };
 
-  // ---------------------------
-  // On Load: Check Saved Login
-  // ---------------------------
+  //-----------------------------
+  // On load: check saved session
+  //-----------------------------
   useEffect(() => {
     const token = getToken();
     const userData = getUserData();
@@ -175,8 +170,6 @@ export const AuthProvider = ({ children }) => {
       setUser(JSON.parse(userData));
     } else {
       clearAuthData();
-      setIsAuthenticated(false);
-      setUser(null);
     }
 
     setLoading(false);
@@ -190,8 +183,8 @@ export const AuthProvider = ({ children }) => {
         loading,
         login,
         logout,
-        refreshUser,
         refreshToken,
+        refreshUser,
         getToken,
       }}
     >
