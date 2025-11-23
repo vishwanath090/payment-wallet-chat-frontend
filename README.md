@@ -199,29 +199,27 @@ gunicorn app.main:app -k uvicorn.workers.UvicornWorker -w 4
 ---
 ## Project Structure (Main Subfolders)
 
-backend/
-│
-├── app/
-│   ├── api/         # Route handlers (auth, wallet, chat, profile, etc.)
-│   ├── core/        # Settings, security, config, dependencies
-│   ├── crud/        # Database access helpers (CRUD operations)
-│   ├── db/          # Database session, init, migrations
-│   ├── models/      # SQLAlchemy models
-│   ├── schemas/     # Pydantic request/response schemas
-│   └── services/    # Business logic (wallet, messaging, auth)
-│
-└── Dockerfile       # Backend container configuration
+### Backend
+- **backend/**
+  - **app/**
+    - api/ — Route handlers (auth, wallet, chat, profile)
+    - core/ — Settings, security, config, dependencies
+    - crud/ — Database access layer (CRUD operations)
+    - db/ — Database session, initialization, migrations
+    - models/ — SQLAlchemy ORM models
+    - schemas/ — Pydantic request/response schemas
+    - services/ — Business logic (wallet, messaging, auth)
+  - Dockerfile — Backend container configuration
 
+### Frontend
+- **frontend/**
+  - **src/**
+    - api/ — Axios clients, API layer
+    - components/ — Reusable UI components
+    - pages/ — Route-level pages (Login, Wallet, Chat)
+    - context/ — Global state (auth, user, theme)
+  - vite.config.js — Frontend build configuration
 
-frontend/
-│
-├── src/
-│   ├── api/         # Axios clients, API layer
-│   ├── components/  # Reusable UI components
-│   ├── pages/       # Route-level pages (Login, Wallet, Chat, etc.)
-│   └── context/     # Global state (auth, user, theme, etc.)
-│
-└── vite.config.js   # Vite configuration
 
 ---
 
