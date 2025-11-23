@@ -197,30 +197,32 @@ gunicorn app.main:app -k uvicorn.workers.UvicornWorker -w 4
 4. Connect Neon PostgreSQL database  
 
 ---
-## Project Structure(MAIN SUBFOLDERS)
+## Project Structure (Main Subfolders)
 
 backend/
 │
 ├── app/
-│ ├── api/ # Route handlers (auth, wallet, chat, profile, etc.)
-│ ├── core/ # Settings, security, config, dependencies
-│ ├── crud/ # Database access helpers (CRUD operations)
-│ ├── db/ # Database session, init, migrations
-│ ├── models/ # SQLAlchemy models
-│ ├── schemas/ # Pydantic request/response schemas
-│ └── services/ # Business logic (wallet, messaging, auth)
+│   ├── api/         # Route handlers (auth, wallet, chat, profile, etc.)
+│   ├── core/        # Settings, security, config, dependencies
+│   ├── crud/        # Database access helpers (CRUD operations)
+│   ├── db/          # Database session, init, migrations
+│   ├── models/      # SQLAlchemy models
+│   ├── schemas/     # Pydantic request/response schemas
+│   └── services/    # Business logic (wallet, messaging, auth)
 │
-└── Dockerfile # Backend container configuration
+└── Dockerfile       # Backend container configuration
+
 
 frontend/
 │
 ├── src/
-│ ├── api/ # Axios clients, API layer
-│ ├── components/ # Reusable UI components
-│ ├── pages/ # Route-level pages (Login, Wallet, Chat, etc.)
-│ └── context/ # Global state (auth, user, theme, etc.)
+│   ├── api/         # Axios clients, API layer
+│   ├── components/  # Reusable UI components
+│   ├── pages/       # Route-level pages (Login, Wallet, Chat, etc.)
+│   └── context/     # Global state (auth, user, theme, etc.)
 │
-└── vite.config.js # Vite configuration
+└── vite.config.js   # Vite configuration
+
 ---
 
 # License
