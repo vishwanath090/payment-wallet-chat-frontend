@@ -1,103 +1,88 @@
 # WalletPay — Digital Wallet System with Realtime Messaging
 
-A modern, full-stack **digital wallet + realtime chat platform** built with **FastAPI**, **PostgreSQL**, **React**, and **WebSockets**.  
-WalletPay implements secure authentication, wallet operations, realtime messaging, and cloud-optimized deployment using **Vercel**, **Render**, and **NeonDB**.
+WalletPay is a full-stack digital wallet and realtime communication platform built using FastAPI, PostgreSQL, React, and WebSockets.  
+It provides secure authentication, wallet operations, realtime chat, and cloud-ready deployments through Vercel, Render, and Neon.  
+The project follows modern engineering standards and demonstrates a scalable, production-grade architecture.
 
 ---
 
-## 🚀 System Architecture
-
-Frontend (React + Vite) → Vercel
-Backend API (FastAPI + JWT Auth) → Render
-Realtime Chat (WebSocket) → FastAPI WS Router
-Database (PostgreSQL) → Neon Cloud
-
-yaml
-Copy code
-
----
-
-## 🌍 Production Deployments
+## Production Deployments
 
 | Component | URL |
 |----------|-----|
-| **Frontend Web App** | https://payment-wallet-chat-frontend.vercel.app |
-| **Backend REST API** | https://payment-wallet-chat-backend.onrender.com |
-| **API Documentation (Swagger UI)** | https://payment-wallet-chat-backend.onrender.com/docs |
-
-> Replace image paths with your own repository assets.
+| Frontend Application | https://payment-wallet-chat-frontend.vercel.app |
+| Backend REST API | https://payment-wallet-chat-backend.onrender.com |
+| API Documentation (Swagger UI) | https://payment-wallet-chat-backend.onrender.com/docs |
 
 ---
 
-# ✨ Core Features
+# Core Features
 
-## 🔐 Authentication & Security
-- Email-based signup & login  
-- JWT access & refresh tokens  
-- Secure PIN-based operations  
-- Password & PIN verification APIs  
-- Protected routes via dependency injection  
+## Authentication & Security
+- Email-based registration and login  
+- Secure JWT access and refresh tokens  
+- PIN-based protected actions  
+- Password and PIN verification endpoints  
+- Fully protected routes via dependency injection  
 
 ---
 
-## 💰 Wallet Operations
-- Add money to wallet  
-- Transfer funds between users  
+## Wallet Operations
+- Add funds to wallet  
+- Transfer money between users  
 - Paginated transaction history  
-- Track transaction types & status  
-- Full server-side validation  
+- Status and transaction-type tracking  
+- Strict server-side validation  
 
 ---
 
-## 💬 Realtime Messaging
+## Realtime Messaging
 - Authenticated WebSocket channel  
-- Two-way realtime chat  
-- Online/offline presence tracking  
-- Read & delivery receipts  
-- Pending messages auto-sent after reconnection  
+- Two-way messaging between users  
+- Presence tracking (online/offline)  
+- Delivery and read receipts  
+- Pending message delivery after reconnection  
 - Chat history retrieval  
 
 ---
 
-## ⚙️ Reliability & Stability
+## Reliability & Stability
 - Automatic WebSocket reconnection  
 - Optimistic UI updates  
-- Server-side persistence  
-- Fully async DB operations  
+- Server-validated persistence  
+- Asynchronous database operations  
 
 ---
 
-# 🏗️ Technology Stack
+# Technology Stack
 
 ## Frontend
 - React (Vite)  
 - React Query  
 - Zustand  
 - Axios  
-- WebSockets  
+- Native WebSockets  
 
 ## Backend
 - FastAPI  
-- SQLAlchemy Async ORM  
-- Pydantic validation  
+- SQLAlchemy (Async ORM)  
+- Pydantic schemas  
 - JWT authentication  
 - WebSocket router  
 
 ## Infrastructure
-- **Vercel** (Frontend)  
-- **Render** (Backend)  
-- **NeonDB** (Managed PostgreSQL)  
+- Vercel (Frontend hosting)  
+- Render (Backend hosting)  
+- Neon (Managed PostgreSQL)  
 
 ---
 
-# 🔧 Environment Configuration
+# Environment Configuration
 
 ## Frontend `.env`
 VITE_API_URL=https://payment-wallet-chat-backend.onrender.com/api/v1
 VITE_WS_URL=wss://payment-wallet-chat-backend.onrender.com/api/v1/chat/ws
 
-shell
-Copy code
 
 ## Backend `.env`
 DATABASE_URL=postgresql+asyncpg://<user>:<password>@<host>/<db>
@@ -105,49 +90,47 @@ JWT_SECRET_KEY=<your-secret>
 JWT_REFRESH_SECRET_KEY=<your-refresh-secret>
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 
-yaml
-Copy code
 
 ---
 
-# 📡 API Documentation Summary
+# API Documentation Summary
 
-## Authentication
+## Authentication Endpoints
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/auth/signup` | Register a new user |
-| POST | `/auth/login` | Login & obtain access tokens |
-| POST | `/auth/refresh` | Refresh JWT access token |
+| POST | /auth/signup | Register a new user |
+| POST | /auth/login | Authenticate and obtain tokens |
+| POST | /auth/refresh | Refresh the access token |
 
 ---
 
-## Wallet
+## Wallet Endpoints
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/wallet/me` | Get wallet details |
-| POST | `/wallet/add-money` | Add money to wallet |
-| POST | `/wallet/transfer` | Transfer funds |
-| GET | `/wallet/history` | Paginated history |
+| GET | /wallet/me | Retrieve wallet details |
+| POST | /wallet/add-money | Add funds |
+| POST | /wallet/transfer | Transfer money to another user |
+| GET | /wallet/history | Paginated transaction history |
 
 ---
 
-## Profile
+## Profile Endpoints
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/profile/` | Fetch profile |
-| PUT | `/profile/` | Update profile |
-| POST | `/profile/verify-pin` | Verify transaction PIN |
-| POST | `/profile/verify-password` | Verify password |
+| GET | /profile/ | Retrieve profile |
+| PUT | /profile/ | Update profile |
+| POST | /profile/verify-pin | Verify transaction PIN |
+| POST | /profile/verify-password | Verify password |
 
 ---
 
-## Messaging (HTTP)
+## Messaging Endpoints (HTTP)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/chat/users` | List chat-eligible users |
-| GET | `/chat/history/{id}` | Retrieve chat history |
-| GET | `/chat/all-messages` | Fetch all messages |
-| PUT | `/chat/messages/{id}/read` | Mark as read |
+| GET | /chat/users | List all users available for chat |
+| GET | /chat/history/{identifier} | Retrieve two-way chat history |
+| GET | /chat/all-messages | Fetch all messages |
+| PUT | /chat/messages/{id}/read | Mark message as read |
 
 ---
 
@@ -156,79 +139,79 @@ Copy code
 ### WebSocket URL Format
 wss://payment-wallet-chat-backend.onrender.com/api/v1/chat/ws/{user_email}?token=<jwt>&user_id=<id>
 
-yaml
-Copy code
 
 ### Capabilities
-- Realtime messaging  
+- Realtime message send/receive  
 - Delivery confirmations  
 - Read receipts  
 - Presence tracking  
-- Auto-delivery of pending messages  
+- Automatic delivery of pending messages  
 
 ---
 
-# 🛠️ Local Development
+# Local Development Setup
 
-## Frontend
-```bash
+## Frontend Setup
 cd frontend
 npm install
 npm run dev
-Backend
-bash
-Copy code
+
+
+## Backend Setup
 cd backend
 pip install -r requirements.txt
 uvicorn app.main:app --reload
-🌐 Deployment Guide
-Frontend (Vercel)
-Import GitHub Repository
 
-Add Environment Variables
-
-Build Command:
-
-arduino
+yaml
 Copy code
+
+---
+
+# Deployment Guide
+
+## Frontend Deployment (Vercel)
+1. Import the GitHub repository  
+2. Configure environment variables  
+3. Build command:
 npm run build
-Output Directory:
 
-nginx
-Copy code
+4. Output directory:
 dist
-Backend (Render)
-Deploy as Web Service
 
-Add Env Variables
+---
 
-Start Command:
-
-nginx
-Copy code
+## Backend Deployment (Render)
+1. Deploy as a Web Service  
+2. Add environment variables  
+3. Start command:
 gunicorn app.main:app -k uvicorn.workers.UvicornWorker -w 4
-Connect NeonDB PostgreSQL
 
-📁 Project Structure
-arduino
-Copy code
+4. Connect Neon PostgreSQL database  
+
+---
+
+# Project Structure
+
 backend/
 │── app/
-│   ├── api/
-│   ├── core/
-│   ├── crud/
-│   ├── db/
-│   ├── models/
-│   ├── schemas/
-│   └── services/
+│ ├── api/
+│ ├── core/
+│ ├── crud/
+│ ├── db/
+│ ├── models/
+│ ├── schemas/
+│ └── services/
 │── Dockerfile
 
 frontend/
 │── src/
-│   ├── api/
-│   ├── components/
-│   ├── pages/
-│   ├── context/
+│ ├── api/
+│ ├── components/
+│ ├── pages/
+│ ├── context/
 │── vite.config.js
-📜 License
-Licensed under the MIT License.
+
+---
+
+# License
+This project is licensed under the MIT License.
