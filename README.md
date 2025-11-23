@@ -197,7 +197,7 @@ gunicorn app.main:app -k uvicorn.workers.UvicornWorker -w 4
 4. Connect Neon PostgreSQL database  
 
 ---
-## Project Structure
+## Project Structure(MAIN SUBFOLDERS)
 
 backend/
 │
