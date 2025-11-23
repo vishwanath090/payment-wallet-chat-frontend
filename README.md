@@ -7,19 +7,17 @@ The project follows modern engineering standards and demonstrates a scalable, pr
 ---
 ## Deployment Architecture Images
 
-Below are placeholders for your deployment architecture visuals.  
-Replace the image paths with your actual screenshots or diagrams.
-
 ### Frontend Deployment (Vercel)
-![Frontend Deployment](./images/frontend-deployment.png)
+<img src="https://github.com/user-attachments/assets/c622aaca-fdee-49b0-a762-34c1d27e312f" alt="Frontend Deployment" width="100%" />
 
 ### Backend Deployment (Render)
-![Backend Deployment](./images/backend-deployment.png)
+<img src="https://github.com/user-attachments/assets/409cfbd8-aa96-4b82-9a16-b283c5035232" alt="Backend Deployment" width="100%" />
 
-### Database Deployment (Neon PostgreSQL)
-![Database Deployment](./images/database-deployment.png)
+### Database Deployment (NeonDB)
+<img src="https://github.com/user-attachments/assets/d9584f1c-add7-49dc-891b-b98be38dcba0" alt="NeonDB Deployment" width="100%" />
 
 ---
+
 ## Production Deployments
 
 | Component | URL |
