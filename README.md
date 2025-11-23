@@ -30,8 +30,8 @@ The project follows modern engineering standards and demonstrates a scalable, pr
 ## Wallet Operations
 - Add funds to wallet  
 - Transfer money between users  
-- Paginated transaction history  
-- Status and transaction-type tracking  
+- Paginated transaction history
+- Status and transaction-type tracking with Graphical analysis
 - Strict server-side validation  
 
 ---
@@ -162,8 +162,6 @@ cd backend
 pip install -r requirements.txt
 uvicorn app.main:app --reload
 
-yaml
-Copy code
 
 ---
 
@@ -174,10 +172,8 @@ Copy code
 2. Configure environment variables  
 3. Build command:
 npm run build
-
 4. Output directory:
 dist
-
 ---
 
 ## Backend Deployment (Render)
