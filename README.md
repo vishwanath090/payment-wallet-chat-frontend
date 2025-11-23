@@ -1,8 +1,8 @@
 # WalletPay — Digital Wallet System with Realtime Messaging
 
-WalletPay is a full-stack digital wallet and realtime communication platform built using FastAPI, PostgreSQL, React, and WebSockets.  
-It provides secure authentication, wallet operations, realtime chat, and cloud-ready deployments through Vercel, Render, and Neon.  
-The project follows modern engineering standards and demonstrates a scalable, production-grade architecture.
+WalletPay is a full-stack digital wallet and realtime communication platform built with FastAPI, PostgreSQL, React, and WebSockets.  
+The application delivers secure user authentication, wallet transactions, and realtime messaging with reliable delivery and presence tracking.  
+It is fully deployed on Vercel, Render, and Neon, showcasing practical experience in designing, building, and deploying a modern production-ready system.
 
 ---
 ## Deployment Architecture Images
