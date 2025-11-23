@@ -1,39 +1,34 @@
-WalletPay Platform
+##WalletPay Platform
+#Digital Wallet System with Real-time Messaging
 
-Digital Wallet System with Realtime Messaging
+📖 Overview
+WalletPay is a full-stack digital wallet and communication platform designed with modern engineering principles. It provides secure user authentication, wallet management, financial transactions, and real-time WebSocket-based chat. The platform serves as a production-ready architecture example combining FastAPI, PostgreSQL, React, and Vercel/Render deployments.
 
-Overview
-
-WalletPay is a full-stack digital wallet and communication platform designed with modern engineering principles.
-It provides secure user authentication, wallet management, financial transactions, and realtime WebSocket-based chat.
-The platform serves as a production-ready architecture example combining FastAPI, PostgreSQL, React, and Vercel/Render deployments.
-
-Architecture
+🏗️ Architecture
+text
 Frontend (React + Vite) → Vercel
 Backend API (FastAPI + JWT Auth) → Render
 Realtime Chat (WebSocket) → FastAPI WS Router
 Database (PostgreSQL) → Neon Cloud
-
-
 All services communicate through secure API routes and authenticated WebSocket channels.
 
-Production Deployments
+🌐 Production Deployments
 Component	URL
 Frontend Web App	https://payment-wallet-chat-frontend.vercel.app
-
 Backend API	https://payment-wallet-chat-backend.onrender.com
-
 API Documentation (Swagger)	https://payment-wallet-chat-backend.onrender.com/docs
-Deployment Verification
+✅ Deployment Verification
 Vercel Deployment
+https://Screenshot%25202025-11-22%2520233302.png
 
 Render Deployment
+https://Screenshot%25202025-11-22%2520233323.png
 
 Neon Database Setup
+https://Screenshot%25202025-11-22%2520233403.png
 
-Core Features
-Authentication & Security
-
+✨ Core Features
+🔐 Authentication & Security
 User signup and login
 
 JWT access and refresh tokens
@@ -44,8 +39,7 @@ Password and PIN verification endpoints
 
 Protected routes using dependency injection
 
-Wallet Operations
-
+💰 Wallet Operations
 Add balance to wallet
 
 Transfer funds to another user
@@ -54,8 +48,7 @@ Complete transaction history with pagination
 
 Transaction types and status tracking
 
-Realtime Messaging
-
+💬 Real-time Messaging
 Authenticated WebSocket channel
 
 Two-way message streaming
@@ -68,8 +61,7 @@ Offline message queue and automatic delivery
 
 Chat history and conversation metadata
 
-System Reliability
-
+🛡️ System Reliability
 Graceful WebSocket reconnection
 
 Optimistic UI updates
@@ -78,53 +70,50 @@ Server-side message persistence
 
 SQLAlchemy async session management
 
-Technology Stack
+🛠️ Technology Stack
 Frontend
+React (Vite) - Modern frontend framework
 
-React (Vite)
+Zustand - State management
 
-Zustand state management
+React Query - Data synchronization
 
-React Query (data synchronization)
+Axios - HTTP client
 
-Axios HTTP client
-
-Secure WebSocket integration
+Secure WebSocket - Real-time communication
 
 Backend
+FastAPI - High-performance API framework
 
-FastAPI
+SQLAlchemy Async ORM - Database operations
 
-SQLAlchemy Async ORM
+Pydantic Schemas - Data validation
 
-Pydantic Schemas
+PostgreSQL (Neon) - Cloud database
 
-PostgreSQL (Neon)
+JWT Authentication - Secure auth
 
-JWT Authentication
-
-WebSocket authentication middleware
+WebSocket middleware - Real-time communication
 
 Infrastructure
+Vercel - Frontend Hosting
 
-Vercel (Frontend Hosting)
+Render - Backend Hosting
 
-Render (Backend Hosting)
+Neon - PostgreSQL Cloud DB
 
-Neon (PostgreSQL Cloud DB)
-
-Environment Configuration
+⚙️ Environment Configuration
 Frontend (.env)
+env
 VITE_API_URL=https://payment-wallet-chat-backend.onrender.com/api/v1
 VITE_WS_URL=wss://payment-wallet-chat-backend.onrender.com/api/v1/chat/ws
-
 Backend (.env)
-DATABASE_URL=postgresql+asyncpg://<user>:<password>@<host>/<database>
-JWT_SECRET_KEY=<your-secret>
-JWT_REFRESH_SECRET_KEY=<your-refresh-secret>
+env
+DATABASE_URL=postgresql+asyncpg://user:pass@host/dbname
+JWT_SECRET_KEY=your-secret-key
+JWT_REFRESH_SECRET_KEY=your-refresh-secret-key
 ACCESS_TOKEN_EXPIRE_MINUTES=30
-
-API Documentation (Summary)
+📚 API Documentation
 Authentication Endpoints
 Method	Endpoint	Description
 POST	/auth/signup	Create new user
@@ -150,15 +139,13 @@ GET	/chat/conversations	List of user conversations
 GET	/chat/all-messages	All messages for user
 PUT	/chat/messages/{id}/read	Mark message as read
 Messaging WebSocket
-
 WebSocket URL format:
 
-wss://payment-wallet-chat-backend.onrender.com/api/v1/chat/ws/{user_email}?token=<JWT>&user_id=<UUID>
-
-
+bash
+wss://payment-wallet-chat-backend.onrender.com/api/v1/chat/ws/{user_email}?token=<token>&user_id=<user_id>
 Events:
 
-Realtime message receive
+Real-time message receive
 
 Message delivered/read updates
 
@@ -168,61 +155,66 @@ Typing indicators
 
 Pending message sync
 
-Local Development Setup
+🚀 Local Development Setup
 Frontend
+bash
 cd frontend
 npm install
 npm run dev
-
 Backend
+bash
 cd backend
 pip install -r requirements.txt
 uvicorn app.main:app --reload
-
-Deployment Guide
+📦 Deployment Guide
 Frontend (Vercel)
+Import GitHub repo to Vercel
 
-Import GitHub repo
+Provide environment variables in Vercel dashboard
 
-Provide .env variables in Vercel dashboard
+Build command: npm run build
 
-Build: npm run build
-
-Output: dist
+Output directory: dist
 
 Backend (Render)
-
 Deploy as a Web Service
 
 Start command:
 
+bash
 gunicorn app.main:app -k uvicorn.workers.UvicornWorker -w 4
-
-
 Add environment variables
 
 Attach PostgreSQL connection
 
-Project Structure
+📁 Project Structure
+text
 backend/
-  app/
-    api/
-    core/
-    crud/
-    db/
-    models/
-    schemas/
-    services/
-  Dockerfile
+├── app/
+│   ├── api/
+│   ├── core/
+│   ├── crud/
+│   ├── db/
+│   ├── models/
+│   ├── schemas/
+│   └── services/
+└── Dockerfile
 
 frontend/
-  src/
-    api/
-    components/
-    pages/
-    context/
-  vite.config.js
-
-License
-
+├── src/
+│   ├── api/
+│   ├── components/
+│   ├── pages/
+│   └── context/
+└── vite.config.js
+📄 License
 This project is licensed under the MIT License.
+
+🔄 Recent Updates
+November 22, 2025: Production deployment completed
+
+All services successfully deployed and operational
+
+Real-time messaging fully functional
+
+Wallet transactions processing correctly
