@@ -5,7 +5,21 @@ It provides secure authentication, wallet operations, realtime chat, and cloud-r
 The project follows modern engineering standards and demonstrates a scalable, production-grade architecture.
 
 ---
+## Deployment Architecture Images
 
+Below are placeholders for your deployment architecture visuals.  
+Replace the image paths with your actual screenshots or diagrams.
+
+### Frontend Deployment (Vercel)
+![Frontend Deployment](./images/frontend-deployment.png)
+
+### Backend Deployment (Render)
+![Backend Deployment](./images/backend-deployment.png)
+
+### Database Deployment (Neon PostgreSQL)
+![Database Deployment](./images/database-deployment.png)
+
+---
 ## Production Deployments
 
 | Component | URL |
