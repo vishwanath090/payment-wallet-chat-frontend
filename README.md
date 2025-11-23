@@ -89,22 +89,6 @@ The project follows modern engineering standards and demonstrates a scalable, pr
 
 ---
 
-# Environment Configuration
-
-## Frontend `.env`
--VITE_API_URL=https://payment-wallet-chat-backend.onrender.com/api/v1
--VITE_WS_URL=wss://payment-wallet-chat-backend.onrender.com/api/v1/chat/ws
-
-
-## Backend `.env`
--DATABASE_URL=postgresql+asyncpg://<user>:<password>@<host>/<db>
--JWT_SECRET_KEY=<your-secret>
--JWT_REFRESH_SECRET_KEY=<your-refresh-secret>
--ACCESS_TOKEN_EXPIRE_MINUTES=30
-
-
----
-
 # API Documentation Summary
 
 ## Authentication Endpoints
