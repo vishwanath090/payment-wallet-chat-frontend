@@ -326,3 +326,17 @@ body {
 .read-the-docs {
   color: #888;
 }
+/* --------- NAVBAR FIX: allow true fixed positioning --------- */
+nav {
+  position: fixed !important;
+  pointer-events: auto !important;
+}
+
+body, html {
+  overflow: visible !important;
+}
+
+.app, main, #root {
+  position: static !important;
+  overflow: visible !important;
+}
