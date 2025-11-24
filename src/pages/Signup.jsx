@@ -28,14 +28,13 @@ const Signup = () => {
 
     try {
       await api.post("/auth/signup", {
-        full_name: formData.fullName,   // FIXED
+        full_name: formData.fullName,
         email: formData.email,
         password: formData.password,
-        pin: formData.pin              // FIXED
+        pin: formData.pin
       });
 
       setMsg("success: Account created successfully! Redirecting...");
-
       setTimeout(() => navigate("/login"), 2000);
 
     } catch (err) {
@@ -87,6 +86,7 @@ const Signup = () => {
 
         {/* Form */}
         <form onSubmit={handleSignup}>
+
           {/* Full Name */}
           <div className="form-group">
             <input
@@ -96,6 +96,8 @@ const Signup = () => {
               className="form-input"
               placeholder="Full Name"
               required
+              autoComplete="off"
+              spellCheck="false"
               style={{ textAlign: "center" }}
             />
           </div>
@@ -110,6 +112,8 @@ const Signup = () => {
               className="form-input"
               placeholder="Email Address"
               required
+              autoComplete="email"
+              spellCheck="false"
               style={{ textAlign: "center" }}
             />
           </div>
@@ -124,6 +128,10 @@ const Signup = () => {
               className="form-input"
               placeholder="Create Password"
               required
+              autoComplete="new-password"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck="false"
               style={{ textAlign: "center" }}
             />
           </div>
@@ -135,11 +143,21 @@ const Signup = () => {
               name="pin"
               maxLength={4}
               value={formData.pin}
-              onChange={handleChange}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  pin: e.target.value.replace(/\D/g, "").slice(0, 4)
+                })
+              }
               className="form-input"
               placeholder="4-digit Security PIN"
               required
-              style={{ textAlign: "center", letterSpacing: "8px" }}
+              autoComplete="off"
+              inputMode="numeric"
+              style={{
+                textAlign: "center",
+                letterSpacing: "8px"
+              }}
             />
             <small style={{
               color: "var(--text-secondary)",
