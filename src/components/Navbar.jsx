@@ -8,118 +8,106 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
 
+  const navRef = useRef(null);
+
   const [isOpen, setIsOpen] = useState(false);
-  const [position, setPosition] = useState("bottom-center"); // default
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
-  const navRef = useRef(null);
+  /* ------------------------------
+      FORCE POSITION FUNCTION
+  ------------------------------ */
+  const forcePosition = (pos) => {
+    const el = navRef.current;
+    if (!el) return;
 
-  // 🔥 Auto reposition based on page
+    el.style.position = "fixed";
+    el.style.zIndex = "999999";
+    el.style.transition = "all 0.35s ease";
+
+    // Clear old
+    el.style.top = "";
+    el.style.bottom = "";
+    el.style.left = "";
+    el.style.right = "";
+    el.style.transform = "";
+
+    if (pos === "bottom-center") {
+      el.style.bottom = "25px";
+      el.style.left = "50%";
+      el.style.transform = "translateX(-50%)";
+    } else if (pos === "top-right") {
+      el.style.top = "20px";
+      el.style.right = "20px";
+    } else if (pos === "top-left") {
+      el.style.top = "20px";
+      el.style.left = "20px";
+    }
+  };
+
+  /* ------------------------------
+      AUTO POSITION ON ROUTE CHANGE
+  ------------------------------ */
   useEffect(() => {
     if (location.pathname === "/dashboard") {
-      setPosition("bottom-center");
+      forcePosition("bottom-center");
     } else {
-      setPosition("top-right");
+      forcePosition("top-right");
     }
   }, [location.pathname]);
 
-  // --- DRAG START ---
-  const startDrag = (clientX, clientY) => {
+  /* ------------------------------
+      DRAG LOGIC
+  ------------------------------ */
+
+  const startDrag = (x) => {
     setIsDragging(true);
-    setDragStart({ x: clientX, y: clientY });
+    setDragStart({ x });
   };
 
   const handleMouseDown = (e) => {
-    if (!e.target.closest("button")) startDrag(e.clientX, e.clientY);
-  };
-
-  const handleTouchStart = (e) => {
-    if (!e.target.closest("button")) {
-      const t = e.touches[0];
-      startDrag(t.clientX, t.clientY);
-    }
-  };
-
-  // --- DRAG MOVE ---
-  const onDragMove = (dx) => {
-    if (dx > 50) setPosition("top-right");
-    else if (dx < -50) setPosition("top-left");
+    if (!e.target.closest("button")) startDrag(e.clientX);
   };
 
   const handleMouseMove = (e) => {
-    if (isDragging) onDragMove(e.clientX - dragStart.x);
-  };
-
-  const handleTouchMove = (e) => {
     if (!isDragging) return;
-    const t = e.touches[0];
-    onDragMove(t.clientX - dragStart.x);
+    const dx = e.clientX - dragStart.x;
+
+    if (dx > 50) forcePosition("top-right");
+    if (dx < -50) forcePosition("top-left");
   };
 
-  // --- DRAG END ---
   const endDrag = () => setIsDragging(false);
 
   useEffect(() => {
     if (isDragging) {
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", endDrag);
-
-      document.addEventListener("touchmove", handleTouchMove, { passive: false });
-      document.addEventListener("touchend", endDrag);
     } else {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", endDrag);
-
-      document.removeEventListener("touchmove", handleTouchMove);
-      document.removeEventListener("touchend", endDrag);
     }
   }, [isDragging]);
 
-  // --- COMPUTE STYLE ---
-  const getStyle = () => {
-    const s = {
-      position: "fixed",
-      zIndex: 1000,
-      background: "rgba(255,255,255,0.12)",
-      backdropFilter: "blur(20px)",
-      borderRadius: "25px",
-      padding: "14px 18px",
-      display: "flex",
-      gap: "12px",
-      transition: "all 0.4s ease",
-      cursor: isDragging ? "grabbing" : "grab"
-    };
+  /* ------------------------------
+      UI
+  ------------------------------ */
 
-    if (position === "bottom-center") {
-      return { ...s, bottom: "25px", left: "50%", transform: "translateX(-50%)" };
-    }
-    if (position === "top-right") {
-      return { ...s, top: "20px", right: "20px" };
-    }
-    if (position === "top-left") {
-      return { ...s, top: "20px", left: "20px" };
-    }
-
-    return s;
+  const navigateTo = (path) => {
+    navigate(path);
+    setIsOpen(false);
   };
-
-  const navItems = [
-    { path: "/dashboard", icon: "🏠", label: "Home" },
-    { path: "/history", icon: "📊", label: "History" }
-  ];
 
   return (
     <>
-      {/* Overlay */}
       {isOpen && (
         <div
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0,0,0,0.4)",
+            background: "rgba(0,0,0,0.45)",
+            zIndex: 900,
             backdropFilter: "blur(4px)",
-            zIndex: 900
           }}
           onClick={() => setIsOpen(false)}
         />
@@ -127,21 +115,28 @@ const Navbar = () => {
 
       <nav
         ref={navRef}
-        style={getStyle()}
         onMouseDown={handleMouseDown}
-        onTouchStart={handleTouchStart}
+        style={{
+          background: "rgba(255,255,255,0.15)",
+          padding: "16px 20px",
+          borderRadius: "25px",
+          display: "flex",
+          gap: "12px",
+          backdropFilter: "blur(20px)",
+          cursor: isDragging ? "grabbing" : "grab",
+        }}
       >
         <button
           onClick={() => setIsOpen(!isOpen)}
           style={{
-            background: "linear-gradient(135deg,#8b5cf6,#3b82f6)",
             width: "56px",
             height: "56px",
             borderRadius: "50%",
             border: "none",
             fontSize: "24px",
             color: "white",
-            cursor: "pointer"
+            cursor: "pointer",
+            background: "linear-gradient(135deg,#8b5cf6,#3b82f6)",
           }}
         >
           {isOpen ? "✕" : "☰"}
@@ -149,32 +144,39 @@ const Navbar = () => {
 
         {isOpen && (
           <div style={{ display: "flex", gap: "12px" }}>
-            {navItems.map((item) => (
-              <button
-                key={item.path}
-                onClick={() => navigate(item.path)}
-                style={{
-                  background: "rgba(255,255,255,0.2)",
-                  padding: "12px 16px",
-                  borderRadius: "14px",
-                  border: "1px solid rgba(255,255,255,0.3)",
-                  color: "white",
-                  cursor: "pointer"
-                }}
-              >
-                {item.icon} {item.label}
-              </button>
-            ))}
+            <button
+              onClick={() => navigateTo("/dashboard")}
+              style={{
+                background: "rgba(255,255,255,0.2)",
+                padding: "12px 16px",
+                borderRadius: "14px",
+                color: "white",
+                border: "1px solid rgba(255,255,255,0.3)",
+              }}
+            >
+              🏠 Home
+            </button>
 
             <button
-              onClick={() => logout()}
+              onClick={() => navigateTo("/history")}
+              style={{
+                background: "rgba(255,255,255,0.2)",
+                padding: "12px 16px",
+                borderRadius: "14px",
+                color: "white",
+                border: "1px solid rgba(255,255,255,0.3)",
+              }}
+            >
+              📊 History
+            </button>
+
+            <button
+              onClick={logout}
               style={{
                 background: "rgba(239,68,68,0.8)",
                 padding: "12px 16px",
                 borderRadius: "14px",
-                border: "1px solid rgba(255,255,255,0.3)",
                 color: "white",
-                cursor: "pointer"
               }}
             >
               🚪 Logout
