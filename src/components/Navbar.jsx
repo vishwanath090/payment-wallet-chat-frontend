@@ -8,136 +8,21 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [position, setPosition] = useState('bottom-center'); // 'bottom-center', 'bottom-left', 'bottom-right'
   const navbarRef = useRef(null);
 
-  // Initialize position to center bottom of the page
+  // Initialize position from localStorage
   useEffect(() => {
     const savedPosition = localStorage.getItem('navbarPosition');
     if (savedPosition) {
-      const { x, y } = JSON.parse(savedPosition);
-      setPosition({ x, y });
-    } else {
-      // Default position: centered at bottom
-      const navbarWidth = 60; // Width of collapsed navbar
-      const x = (window.innerWidth - navbarWidth) / 2;
-      const y = window.innerHeight - 80; // 80px from bottom
-      setPosition({ x, y });
+      setPosition(savedPosition);
     }
   }, []);
 
-  // Mouse events for desktop
-  const handleMouseDown = (e) => {
-    // Only start dragging if clicking on the navbar background
-    const isNavbar = e.target === navbarRef.current || 
-                     e.target.closest('nav') === navbarRef.current;
-    
-    if (isNavbar) {
-      setIsDragging(true);
-      setDragStart({
-        x: e.clientX - position.x,
-        y: e.clientY - position.y
-      });
-      e.preventDefault();
-    }
-  };
-
-  const handleMouseMove = (e) => {
-    if (!isDragging) return;
-
-    const x = e.clientX - dragStart.x;
-    const y = e.clientY - dragStart.y;
-
-    updatePosition(x, y);
-  };
-
-  const handleMouseUp = () => {
-    if (isDragging) {
-      setIsDragging(false);
-      localStorage.setItem('navbarPosition', JSON.stringify(position));
-    }
-  };
-
-  // Touch events for mobile
-  const handleTouchStart = (e) => {
-    const touch = e.touches[0];
-    const isNavbar = e.target === navbarRef.current || 
-                     e.target.closest('nav') === navbarRef.current;
-    
-    if (isNavbar) {
-      setIsDragging(true);
-      setDragStart({
-        x: touch.clientX - position.x,
-        y: touch.clientY - position.y
-      });
-      e.preventDefault();
-    }
-  };
-
-  const handleTouchMove = (e) => {
-    if (!isDragging) return;
-
-    const touch = e.touches[0];
-    const x = touch.clientX - dragStart.x;
-    const y = touch.clientY - dragStart.y;
-
-    updatePosition(x, y);
-    e.preventDefault();
-  };
-
-  const handleTouchEnd = () => {
-    if (isDragging) {
-      setIsDragging(false);
-      localStorage.setItem('navbarPosition', JSON.stringify(position));
-    }
-  };
-
-  // Common position update function
-  const updatePosition = (x, y) => {
-    const navbar = navbarRef.current;
-    if (!navbar) return;
-
-    const rect = navbar.getBoundingClientRect();
-    const maxX = window.innerWidth - rect.width - 10;
-    const maxY = window.innerHeight - rect.height - 10;
-    const boundedX = Math.max(10, Math.min(x, maxX));
-    const boundedY = Math.max(10, Math.min(y, maxY));
-
-    setPosition({ x: boundedX, y: boundedY });
-  };
-
-  // Add event listeners for dragging
+  // Update position when preference changes
   useEffect(() => {
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-      document.addEventListener('touchmove', handleTouchMove, { passive: false });
-      document.addEventListener('touchend', handleTouchEnd);
-      
-      document.body.style.cursor = 'grabbing';
-      document.body.style.userSelect = 'none';
-    } else {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('touchend', handleTouchEnd);
-      
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-    }
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('touchend', handleTouchEnd);
-      
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-    };
-  }, [isDragging, dragStart]);
+    localStorage.setItem('navbarPosition', position);
+  }, [position]);
 
   const handleLogout = () => {
     logout();
@@ -145,9 +30,12 @@ const Navbar = () => {
   };
 
   const navItems = [
-    { path: '/dashboard', icon: '🏠', label: 'Home', color: 'rgba(139, 92, 246, 0.8)' },
-    { path: '/history', icon: '📊', label: 'History', color: 'rgba(59, 130, 246, 0.8)' },
-    { path: '/settings', icon: '⚙️', label: 'Settings', color: 'rgba(16, 185, 129, 0.8)' },
+    { path: '/dashboard', icon: '🏠', label: 'Home', color: 'rgba(139, 92, 246, 0.9)' },
+    { path: '/history', icon: '📊', label: 'History', color: 'rgba(59, 130, 246, 0.9)' },
+    { path: '/add-money', icon: '💰', label: 'Add Money', color: 'rgba(16, 185, 129, 0.9)' },
+    { path: '/send-money', icon: '💸', label: 'Send Money', color: 'rgba(245, 158, 11, 0.9)' },
+    { path: '/contacts', icon: '👥', label: 'Contacts', color: 'rgba(168, 85, 247, 0.9)' },
+    { path: '/settings', icon: '⚙️', label: 'Settings', color: 'rgba(107, 114, 128, 0.9)' },
   ];
 
   const handleNavClick = (path) => {
@@ -157,6 +45,54 @@ const Navbar = () => {
       navigate(path);
     }
     setIsOpen(false);
+  };
+
+  const getNavbarStyle = () => {
+    const baseStyle = {
+      position: 'fixed',
+      background: 'rgba(255, 255, 255, 0.15)',
+      backdropFilter: 'blur(20px) saturate(180%)',
+      border: '1px solid rgba(255, 255, 255, 0.3)',
+      borderRadius: '25px',
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: '12px 16px',
+      zIndex: 1000,
+      boxShadow: `
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.1)
+      `,
+      transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+      gap: '8px',
+    };
+
+    switch (position) {
+      case 'bottom-left':
+        return {
+          ...baseStyle,
+          bottom: '20px',
+          left: '20px',
+          right: 'auto',
+        };
+      case 'bottom-right':
+        return {
+          ...baseStyle,
+          bottom: '20px',
+          right: '20px',
+          left: 'auto',
+        };
+      case 'bottom-center':
+      default:
+        return {
+          ...baseStyle,
+          bottom: '20px',
+          left: '50%',
+          right: 'auto',
+          transform: 'translateX(-50%)',
+        };
+    }
   };
 
   return (
@@ -170,9 +106,9 @@ const Navbar = () => {
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'rgba(0, 0, 0, 0.3)',
-            backdropFilter: 'blur(2px)',
-            zIndex: 999,
+            background: 'rgba(0, 0, 0, 0.4)',
+            backdropFilter: 'blur(4px)',
+            zIndex: 998,
           }}
           onClick={() => setIsOpen(false)}
         />
@@ -180,32 +116,7 @@ const Navbar = () => {
       
       <nav 
         ref={navbarRef}
-        style={{
-          position: 'fixed',
-          left: `${position.x}px`,
-          top: `${position.y}px`,
-          background: 'rgba(255, 255, 255, 0.15)',
-          backdropFilter: 'blur(20px) saturate(180%)',
-          border: '1px solid rgba(255, 255, 255, 0.3)',
-          borderRadius: '25px',
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          padding: '12px 16px',
-          zIndex: 1000,
-          boxShadow: `
-            0 20px 40px rgba(0, 0, 0, 0.3),
-            inset 0 1px 0 rgba(255, 255, 255, 0.4),
-            inset 0 -1px 0 rgba(0, 0, 0, 0.1)
-          `,
-          transition: isDragging ? 'none' : 'all 0.3s ease',
-          cursor: isDragging ? 'grabbing' : 'grab',
-          gap: '8px',
-          minWidth: '60px',
-          touchAction: 'none',
-        }}
-        onMouseDown={handleMouseDown}
-        onTouchStart={handleTouchStart}
+        style={getNavbarStyle()}
       >
         
         {/* Main Menu Button */}
@@ -215,22 +126,68 @@ const Navbar = () => {
             background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.9), rgba(59, 130, 246, 0.9))',
             border: 'none',
             borderRadius: '50%',
-            width: '48px',
-            height: '48px',
+            width: '52px',
+            height: '52px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
-            fontSize: '20px',
+            fontSize: '22px',
             color: 'white',
             transition: 'all 0.3s ease',
-            transform: isOpen ? 'rotate(90deg)' : 'rotate(0)',
-            boxShadow: '0 8px 20px rgba(139, 92, 246, 0.4)',
+            transform: isOpen ? 'rotate(90deg) scale(1.1)' : 'rotate(0) scale(1)',
+            boxShadow: isOpen 
+              ? '0 12px 25px rgba(139, 92, 246, 0.6)' 
+              : '0 8px 20px rgba(139, 92, 246, 0.4)',
             flexShrink: 0,
           }}
         >
           {isOpen ? '✕' : '☰'}
         </button>
+
+        {/* Position Selector */}
+        {isOpen && (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px',
+            marginRight: '12px',
+            paddingRight: '12px',
+            borderRight: '1px solid rgba(255, 255, 255, 0.2)',
+          }}>
+            {[
+              { pos: 'bottom-left', icon: '↙️', label: 'Left' },
+              { pos: 'bottom-center', icon: '⬇️', label: 'Center' },
+              { pos: 'bottom-right', icon: '↘️', label: 'Right' },
+            ].map((posOption) => (
+              <button
+                key={posOption.pos}
+                onClick={() => setPosition(posOption.pos)}
+                style={{
+                  background: position === posOption.pos 
+                    ? 'rgba(255, 255, 255, 0.3)' 
+                    : 'rgba(255, 255, 255, 0.1)',
+                  border: position === posOption.pos 
+                    ? '1px solid rgba(255, 255, 255, 0.5)' 
+                    : '1px solid rgba(255, 255, 255, 0.2)',
+                  borderRadius: '12px',
+                  width: '44px',
+                  height: '44px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  fontSize: '16px',
+                  color: 'white',
+                  transition: 'all 0.2s ease',
+                }}
+                title={`Position: ${posOption.label}`}
+              >
+                {posOption.icon}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Expanded Menu Items */}
         {isOpen && (
@@ -238,8 +195,10 @@ const Navbar = () => {
             display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
-            gap: '8px',
+            gap: '10px',
             animation: 'slideInRight 0.3s ease',
+            flexWrap: 'wrap',
+            maxWidth: '500px',
           }}>
             {navItems.map((item, index) => (
               <button
@@ -250,33 +209,45 @@ const Navbar = () => {
                   flexDirection: 'column',
                   alignItems: 'center',
                   background: location.pathname === item.path ? 
-                    `linear-gradient(135deg, ${item.color}, rgba(255, 255, 255, 0.2))` : 
+                    `linear-gradient(135deg, ${item.color}, rgba(255, 255, 255, 0.3))` : 
                     'rgba(255, 255, 255, 0.1)',
                   border: location.pathname === item.path ? 
-                    '1px solid rgba(255, 255, 255, 0.4)' : 
+                    '1px solid rgba(255, 255, 255, 0.5)' : 
                     '1px solid rgba(255, 255, 255, 0.2)',
                   color: 'white',
-                  padding: '12px 16px',
-                  borderRadius: '20px',
+                  padding: '12px 14px',
+                  borderRadius: '18px',
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
-                  minWidth: '80px',
-                  minHeight: '60px',
+                  minWidth: '75px',
+                  minHeight: '65px',
                   justifyContent: 'center',
                   backdropFilter: 'blur(10px)',
+                  flexShrink: 0,
+                }}
+                onMouseEnter={(e) => {
+                  if (location.pathname !== item.path) {
+                    e.target.style.background = `linear-gradient(135deg, ${item.color.replace('0.9', '0.4')}, rgba(255, 255, 255, 0.2))`;
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (location.pathname !== item.path) {
+                    e.target.style.background = 'rgba(255, 255, 255, 0.1)';
+                  }
                 }}
               >
                 <div style={{
                   fontSize: '20px',
-                  marginBottom: '4px',
-                  filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
+                  marginBottom: '6px',
+                  filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
+                  transition: 'all 0.2s ease',
                 }}>
                   {item.icon}
                 </div>
                 <span style={{
-                  fontSize: '10px',
+                  fontSize: '11px',
                   fontWeight: '700',
-                  letterSpacing: '0.5px',
+                  letterSpacing: '0.3px',
                   textShadow: '0 1px 2px rgba(0,0,0,0.5)'
                 }}>
                   {item.label}
@@ -294,27 +265,36 @@ const Navbar = () => {
                 background: 'rgba(239, 68, 68, 0.8)',
                 border: '1px solid rgba(255, 255, 255, 0.3)',
                 color: 'white',
-                padding: '12px 16px',
-                borderRadius: '20px',
+                padding: '12px 14px',
+                borderRadius: '18px',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
-                minWidth: '80px',
-                minHeight: '60px',
+                minWidth: '75px',
+                minHeight: '65px',
                 justifyContent: 'center',
                 backdropFilter: 'blur(10px)',
+                flexShrink: 0,
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.background = 'rgba(239, 68, 68, 0.9)';
+                e.target.style.transform = 'scale(1.05)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = 'rgba(239, 68, 68, 0.8)';
+                e.target.style.transform = 'scale(1)';
               }}
             >
               <div style={{
                 fontSize: '20px',
-                marginBottom: '4px',
+                marginBottom: '6px',
                 filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
               }}>
                 🚪
               </div>
               <span style={{
-                fontSize: '10px',
+                fontSize: '11px',
                 fontWeight: '700',
-                letterSpacing: '0.5px',
+                letterSpacing: '0.3px',
                 textShadow: '0 1px 2px rgba(0,0,0,0.5)'
               }}>
                 Logout
@@ -346,7 +326,7 @@ const Navbar = () => {
             @keyframes slideInRight {
               from {
                 opacity: 0;
-                transform: translateX(-20px);
+                transform: translateX(-10px);
               }
               to {
                 opacity: 1;
@@ -358,26 +338,57 @@ const Navbar = () => {
             @media (max-width: 768px) {
               nav {
                 padding: 10px 12px;
-                transform: scale(0.95);
+                max-width: 95vw;
+              }
+              
+              /* Stack menu items vertically on mobile */
+              nav > div:last-child {
+                flex-direction: column;
+                max-height: 60vh;
+                overflow-y: auto;
               }
               
               button {
-                min-width: 70px;
+                min-width: 120px;
                 min-height: 55px;
+              }
+              
+              .position-selector {
+                flex-direction: row !important;
+                border-right: none !important;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+                margin-right: 0 !important;
+                margin-bottom: 8px;
+                padding-right: 0 !important;
+                padding-bottom: 8px;
               }
             }
 
             @media (max-width: 480px) {
               nav {
                 padding: 8px 10px;
-                transform: scale(0.9);
               }
               
               button {
-                min-width: 65px;
+                min-width: 110px;
                 min-height: 50px;
                 padding: 10px 12px;
               }
+            }
+
+            /* Custom scrollbar for mobile */
+            nav > div:last-child::-webkit-scrollbar {
+              width: 4px;
+            }
+
+            nav > div:last-child::-webkit-scrollbar-track {
+              background: rgba(255, 255, 255, 0.1);
+              border-radius: 2px;
+            }
+
+            nav > div:last-child::-webkit-scrollbar-thumb {
+              background: rgba(255, 255, 255, 0.3);
+              border-radius: 2px;
             }
           `}
         </style>
