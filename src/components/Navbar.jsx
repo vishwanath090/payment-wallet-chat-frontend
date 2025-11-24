@@ -9,176 +9,26 @@ const Navbar = () => {
   const { logout } = useAuth();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [position, setPosition] = useState("bottom-center"); // default bottom-center for dashboard
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [position, setPosition] = useState("bottom-center");
   const navbarRef = useRef(null);
 
-  // Restore saved position and handle page-specific positioning
+  // 🔥 FIXED: Auto position based on page
   useEffect(() => {
-    const saved = localStorage.getItem("navbarPosition");
-    if (saved) {
-      setPosition(saved);
-    } else {
-      // Default position based on current page
-      if (location.pathname === '/dashboard') {
-        setPosition("bottom-center");
-      } else {
-        setPosition("top-left");
-      }
-    }
-  }, []);
-
-  // 🔥 Auto position based on page
-  useEffect(() => {
+    console.log('Page changed to:', location.pathname);
+    
     if (location.pathname === '/dashboard') {
+      console.log('Setting position to bottom-center');
       setPosition("bottom-center");
     } else {
+      console.log('Setting position to top-left');
       setPosition("top-left");
     }
-  }, [location.pathname]);
+  }, [location.pathname]); // This will run every time the route changes
 
-  // Save updated position
+  // Save position to localStorage when it changes
   useEffect(() => {
     localStorage.setItem("navbarPosition", position);
   }, [position]);
-
-  // Mouse drag
-  const handleMouseDown = (e) => {
-    if (!e.target.closest("button") && !e.target.closest("a")) {
-      setIsDragging(true);
-      setDragStart({ x: e.clientX, y: e.clientY });
-    }
-  };
-
-  const handleMouseMove = (e) => {
-    if (!isDragging) return;
-
-    const deltaX = e.clientX - dragStart.x;
-    const deltaY = e.clientY - dragStart.y;
-
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      // Horizontal drag - change position
-      if (deltaX > 50) {
-        if (position.includes('top')) {
-          setPosition("top-right");
-        } else {
-          setPosition("bottom-right");
-        }
-      }
-      if (deltaX < -50) {
-        if (position.includes('top')) {
-          setPosition("top-left");
-        } else {
-          setPosition("bottom-left");
-        }
-      }
-    } else {
-      // Vertical drag - change top/bottom
-      if (deltaY > 50) {
-        if (position.includes('left')) {
-          setPosition("bottom-left");
-        } else if (position.includes('right')) {
-          setPosition("bottom-right");
-        } else {
-          setPosition("bottom-center");
-        }
-      }
-      if (deltaY < -50) {
-        if (position.includes('left')) {
-          setPosition("top-left");
-        } else if (position.includes('right')) {
-          setPosition("top-right");
-        } else {
-          setPosition("top-center");
-        }
-      }
-    }
-  };
-
-  const handleMouseUp = () => setIsDragging(false);
-
-  // Touch drag
-  const handleTouchStart = (e) => {
-    if (!e.target.closest("button") && !e.target.closest("a")) {
-      const t = e.touches[0];
-      setIsDragging(true);
-      setDragStart({ x: t.clientX, y: t.clientY });
-    }
-  };
-
-  const handleTouchMove = (e) => {
-    if (!isDragging) return;
-    const t = e.touches[0];
-
-    const deltaX = t.clientX - dragStart.x;
-    const deltaY = t.clientY - dragStart.y;
-
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      // Horizontal drag
-      if (deltaX > 60) {
-        if (position.includes('top')) {
-          setPosition("top-right");
-        } else {
-          setPosition("bottom-right");
-        }
-      }
-      if (deltaX < -60) {
-        if (position.includes('top')) {
-          setPosition("top-left");
-        } else {
-          setPosition("bottom-left");
-        }
-      }
-    } else {
-      // Vertical drag
-      if (deltaY > 60) {
-        if (position.includes('left')) {
-          setPosition("bottom-left");
-        } else if (position.includes('right')) {
-          setPosition("bottom-right");
-        } else {
-          setPosition("bottom-center");
-        }
-      }
-      if (deltaY < -60) {
-        if (position.includes('left')) {
-          setPosition("top-left");
-        } else if (position.includes('right')) {
-          setPosition("top-right");
-        } else {
-          setPosition("top-center");
-        }
-      }
-    }
-  };
-
-  const handleTouchEnd = () => setIsDragging(false);
-
-  // Attach listeners
-  useEffect(() => {
-    if (isDragging) {
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
-      document.addEventListener("touchmove", handleTouchMove, { passive: false });
-      document.addEventListener("touchend", handleTouchEnd);
-      document.body.style.cursor = 'grabbing';
-    } else {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-      document.removeEventListener("touchmove", handleTouchMove);
-      document.removeEventListener("touchend", handleTouchEnd);
-      document.body.style.cursor = '';
-    }
-
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-      document.removeEventListener("touchmove", handleTouchMove);
-      document.removeEventListener("touchend", handleTouchEnd);
-      document.body.style.cursor = '';
-    };
-  }, [isDragging]);
 
   const handleLogout = () => {
     logout();
@@ -196,12 +46,15 @@ const Navbar = () => {
   ];
 
   const handleNavClick = (path) => {
-    if (path === "logout") handleLogout();
-    else navigate(path);
+    if (path === "logout") {
+      handleLogout();
+    } else {
+      navigate(path);
+    }
     setIsOpen(false);
   };
 
-  // 🔥 Navbar position with all options
+  // 🔥 SIMPLE POSITIONING - No dragging for now
   const getNavbarStyle = () => {
     const base = {
       position: "fixed",
@@ -214,11 +67,13 @@ const Navbar = () => {
       alignItems: "center",
       gap: "12px",
       zIndex: 1000,
-      cursor: isDragging ? "grabbing" : "grab",
       transition: "all 0.45s cubic-bezier(0.4, 0, 0.2, 1)",
       boxShadow: "0 20px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.4)",
       minHeight: "70px",
     };
+
+    // Debug current position
+    console.log('Current navbar position:', position);
 
     switch (position) {
       case "top-left":
@@ -245,7 +100,10 @@ const Navbar = () => {
         <div
           style={{
             position: "fixed",
-            inset: 0,
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
             background: "rgba(0,0,0,0.45)",
             backdropFilter: "blur(4px)",
             zIndex: 900,
@@ -254,32 +112,25 @@ const Navbar = () => {
         />
       )}
 
-      {/* Position Indicator */}
-      {!isOpen && (
-        <div style={{
-          position: 'fixed',
-          [position.includes('top') ? 'bottom' : 'top']: '20px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          background: 'rgba(0,0,0,0.7)',
-          color: 'white',
-          padding: '8px 16px',
-          borderRadius: '12px',
-          fontSize: '12px',
-          zIndex: 999,
-          backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(255,255,255,0.2)',
-          whiteSpace: 'nowrap',
-        }}>
-          📍 {position.replace('-', ' ')} • Drag to move
-        </div>
-      )}
+      {/* Position Debug Info */}
+      <div style={{
+        position: 'fixed',
+        top: '10px',
+        left: '10px',
+        background: 'rgba(0,0,0,0.8)',
+        color: 'white',
+        padding: '10px',
+        borderRadius: '5px',
+        fontSize: '12px',
+        zIndex: 1001,
+      }}>
+        Page: {location.pathname}<br/>
+        Navbar: {position}
+      </div>
 
       <nav
         ref={navbarRef}
         style={getNavbarStyle()}
-        onMouseDown={handleMouseDown}
-        onTouchStart={handleTouchStart}
       >
         {/* Main button */}
         <button
@@ -305,7 +156,7 @@ const Navbar = () => {
           {isOpen ? "✕" : "☰"}
         </button>
 
-        {/* Position Indicator inside navbar */}
+        {/* Position Indicator */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
