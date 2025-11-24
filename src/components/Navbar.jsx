@@ -1,145 +1,117 @@
-// components/Navbar.jsx
+// src/components/Navbar.jsx
+
 import React, { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext"; // ✅ FIXED PATH
 
 const Navbar = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
   const [isOpen, setIsOpen] = useState(false);
 
-  const navigateTo = (path) => {
-    if (path === "logout") {
-      // Simple logout - clear storage and redirect
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      window.location.href = "/login";
-      return;
-    }
-    
-    // Simple navigation using window.location
-    window.location.href = path;
+  // Simple navigation items
+  const navItems = [
+    { path: "/dashboard", icon: "🏠", label: "Home" },
+    { path: "/history", icon: "📊", label: "History" },
+  ];
+
+  const handleNavClick = (path) => {
+    navigate(path);
     setIsOpen(false);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
   };
 
   return (
     <>
+      {/* Background overlay when menu opens */}
       {isOpen && (
         <div
           style={{
             position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(0,0,0,0.45)",
-            zIndex: 900,
+            inset: 0,
+            background: "rgba(0,0,0,0.4)",
             backdropFilter: "blur(4px)",
+            zIndex: 900,
           }}
           onClick={() => setIsOpen(false)}
         />
       )}
 
+      {/* NAVBAR — Always at TOP RIGHT */}
       <nav
         style={{
           position: "fixed",
           top: "20px",
           right: "20px",
-          background: "rgba(255,255,255,0.15)",
+          zIndex: 1000,
+          background: "rgba(255,255,255,0.12)",
           backdropFilter: "blur(20px)",
-          border: "1px solid rgba(255,255,255,0.3)",
           borderRadius: "25px",
-          padding: "16px 20px",
+          padding: "14px 18px",
           display: "flex",
           alignItems: "center",
           gap: "12px",
-          zIndex: 1000,
-          boxShadow: "0 20px 40px rgba(0, 0, 0, 0.3)",
+          transition: "all 0.3s ease",
         }}
       >
+        {/* Menu Toggle Button */}
         <button
           onClick={() => setIsOpen(!isOpen)}
           style={{
+            background: "linear-gradient(135deg,#8b5cf6,#3b82f6)",
             width: "56px",
             height: "56px",
             borderRadius: "50%",
             border: "none",
-            fontSize: "24px",
             color: "white",
+            fontSize: "24px",
             cursor: "pointer",
-            background: "linear-gradient(135deg,#8b5cf6,#3b82f6)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            transition: "all 0.3s ease",
-            transform: isOpen ? "rotate(90deg)" : "rotate(0)",
           }}
         >
           {isOpen ? "✕" : "☰"}
         </button>
 
+        {/* Expanded menu */}
         {isOpen && (
-          <div style={{ 
-            display: "flex", 
-            gap: "12px",
-          }}>
-            <button
-              onClick={() => navigateTo("/dashboard")}
-              style={{
-                background: "rgba(255,255,255,0.2)",
-                padding: "14px 16px",
-                borderRadius: "18px",
-                color: "white",
-                border: "1px solid rgba(255,255,255,0.3)",
-                cursor: "pointer",
-                minWidth: "100px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "6px",
-                backdropFilter: "blur(10px)",
-              }}
-            >
-              <span style={{ fontSize: "20px" }}>🏠</span>
-              <span style={{ fontSize: "11px", fontWeight: "600" }}>Home</span>
-            </button>
+          <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+            {navItems.map((item) => (
+              <button
+                key={item.path}
+                onClick={() => handleNavClick(item.path)}
+                style={{
+                  background: "rgba(255,255,255,0.2)",
+                  padding: "12px 16px",
+                  borderRadius: "14px",
+                  border: "1px solid rgba(255,255,255,0.3)",
+                  color: "white",
+                  fontSize: "15px",
+                  cursor: "pointer",
+                }}
+              >
+                {item.icon} {item.label}
+              </button>
+            ))}
 
+            {/* Logout */}
             <button
-              onClick={() => navigateTo("/history")}
-              style={{
-                background: "rgba(255,255,255,0.2)",
-                padding: "14px 16px",
-                borderRadius: "18px",
-                color: "white",
-                border: "1px solid rgba(255,255,255,0.3)",
-                cursor: "pointer",
-                minWidth: "100px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "6px",
-                backdropFilter: "blur(10px)",
-              }}
-            >
-              <span style={{ fontSize: "20px" }}>📊</span>
-              <span style={{ fontSize: "11px", fontWeight: "600" }}>History</span>
-            </button>
-
-            <button
-              onClick={() => navigateTo("logout")}
+              onClick={handleLogout}
               style={{
                 background: "rgba(239,68,68,0.8)",
-                padding: "14px 16px",
-                borderRadius: "18px",
-                color: "white",
+                padding: "12px 16px",
+                borderRadius: "14px",
                 border: "1px solid rgba(255,255,255,0.3)",
+                color: "white",
+                fontSize: "15px",
                 cursor: "pointer",
-                minWidth: "100px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "6px",
-                backdropFilter: "blur(10px)",
               }}
             >
-              <span style={{ fontSize: "20px" }}>🚪</span>
-              <span style={{ fontSize: "11px", fontWeight: "600" }}>Logout</span>
+              🚪 Logout
             </button>
           </div>
         )}
