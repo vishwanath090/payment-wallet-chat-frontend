@@ -33,12 +33,14 @@ const PublicRoute = ({ children }) => {
   return !isAuthenticated ? children : <Navigate to="/dashboard" replace />;
 };
 
-// Wrapper component for pages that need navbar spacing
-const PageWithNavbar = ({ children }) => {
+// Minimal wrapper that only adds bottom spacing for navbar
+const NavbarSpacer = ({ children }) => {
   return (
     <div style={{ 
-      paddingBottom: '120px', // Space for navbar
-      minHeight: '100vh'
+      paddingBottom: '100px', // Only bottom padding for navbar
+      minHeight: '100vh',
+      margin: 0,
+      paddingTop: 0 // Ensure no top padding
     }}>
       {children}
     </div>
@@ -53,13 +55,13 @@ function App() {
   }
 
   return (
-    <div className="app">
+    <div className="app" style={{ margin: 0, padding: 0 }}>
       {isAuthenticated && <Navbar />}
 
-      <main>
+      <main style={{ margin: 0, padding: 0 }}>
         <Routes>
 
-          {/* PUBLIC ROUTES */}
+          {/* PUBLIC ROUTES - No navbar spacing */}
           <Route
             path="/login"
             element={
@@ -87,14 +89,14 @@ function App() {
             }
           />
 
-          {/* PROTECTED ROUTES WITH NAVBAR SPACING */}
+          {/* PROTECTED ROUTES - Only bottom spacing for navbar */}
           <Route 
             path="/dashboard" 
             element={
               <ProtectedRoute>
-                <PageWithNavbar>
+                <NavbarSpacer>
                   <Dashboard />
-                </PageWithNavbar>
+                </NavbarSpacer>
               </ProtectedRoute>
             } 
           />
@@ -103,9 +105,9 @@ function App() {
             path="/history" 
             element={
               <ProtectedRoute>
-                <PageWithNavbar>
+                <NavbarSpacer>
                   <History />
-                </PageWithNavbar>
+                </NavbarSpacer>
               </ProtectedRoute>
             } 
           />
@@ -114,9 +116,9 @@ function App() {
             path="/chat" 
             element={
               <ProtectedRoute>
-                <PageWithNavbar>
+                <NavbarSpacer>
                   <Chat />
-                </PageWithNavbar>
+                </NavbarSpacer>
               </ProtectedRoute>
             } 
           />
@@ -125,9 +127,9 @@ function App() {
             path="/add-money" 
             element={
               <ProtectedRoute>
-                <PageWithNavbar>
+                <NavbarSpacer>
                   <AddMoney />
-                </PageWithNavbar>
+                </NavbarSpacer>
               </ProtectedRoute>
             } 
           />
@@ -136,9 +138,9 @@ function App() {
             path="/send-money" 
             element={
               <ProtectedRoute>
-                <PageWithNavbar>
+                <NavbarSpacer>
                   <SendMoney />
-                </PageWithNavbar>
+                </NavbarSpacer>
               </ProtectedRoute>
             } 
           />
@@ -147,9 +149,9 @@ function App() {
             path="/settings" 
             element={
               <ProtectedRoute>
-                <PageWithNavbar>
+                <NavbarSpacer>
                   <Settings />
-                </PageWithNavbar>
+                </NavbarSpacer>
               </ProtectedRoute>
             } 
           />
@@ -158,9 +160,9 @@ function App() {
             path="/contacts" 
             element={
               <ProtectedRoute>
-                <PageWithNavbar>
+                <NavbarSpacer>
                   <Contacts />
-                </PageWithNavbar>
+                </NavbarSpacer>
               </ProtectedRoute>
             } 
           />
