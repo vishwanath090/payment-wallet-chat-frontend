@@ -33,17 +33,14 @@ const PublicRoute = ({ children }) => {
   return !isAuthenticated ? children : <Navigate to="/dashboard" replace />;
 };
 
-// Wrapper for pages with left navbar
+// Simple wrapper that doesn't add any spacing since navbar is draggable
 const PageWithNavbar = ({ children }) => {
   return (
     <div style={{ 
-      marginLeft: '120px', // Space for left navbar
       minHeight: '100vh',
-      width: 'calc(100vw - 120px)',
+      width: '100%',
       padding: '0',
-      marginTop: '0',
-      marginBottom: '0',
-      marginRight: '0'
+      margin: '0'
     }}>
       {children}
     </div>
@@ -64,7 +61,7 @@ function App() {
       <main style={{ margin: 0, padding: 0 }}>
         <Routes>
 
-          {/* PUBLIC ROUTES - No navbar spacing */}
+          {/* PUBLIC ROUTES - No navbar */}
           <Route
             path="/login"
             element={
@@ -92,7 +89,7 @@ function App() {
             }
           />
 
-          {/* PROTECTED ROUTES - With left navbar spacing */}
+          {/* PROTECTED ROUTES - With draggable navbar */}
           <Route 
             path="/dashboard" 
             element={
