@@ -33,6 +33,18 @@ const PublicRoute = ({ children }) => {
   return !isAuthenticated ? children : <Navigate to="/dashboard" replace />;
 };
 
+// Wrapper component for pages that need navbar spacing
+const PageWithNavbar = ({ children }) => {
+  return (
+    <div style={{ 
+      paddingBottom: '120px', // Space for navbar
+      minHeight: '100vh'
+    }}>
+      {children}
+    </div>
+  );
+};
+
 function App() {
   const { isAuthenticated, loading } = useAuth();
 
@@ -75,14 +87,83 @@ function App() {
             }
           />
 
-          {/* PROTECTED ROUTES */}
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
-          <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
-          <Route path="/add-money" element={<ProtectedRoute><AddMoney /></ProtectedRoute>} />
-          <Route path="/send-money" element={<ProtectedRoute><SendMoney /></ProtectedRoute>} />
-          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-          <Route path="/contacts" element={<ProtectedRoute><Contacts /></ProtectedRoute>} />
+          {/* PROTECTED ROUTES WITH NAVBAR SPACING */}
+          <Route 
+            path="/dashboard" 
+            element={
+              <ProtectedRoute>
+                <PageWithNavbar>
+                  <Dashboard />
+                </PageWithNavbar>
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/history" 
+            element={
+              <ProtectedRoute>
+                <PageWithNavbar>
+                  <History />
+                </PageWithNavbar>
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/chat" 
+            element={
+              <ProtectedRoute>
+                <PageWithNavbar>
+                  <Chat />
+                </PageWithNavbar>
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/add-money" 
+            element={
+              <ProtectedRoute>
+                <PageWithNavbar>
+                  <AddMoney />
+                </PageWithNavbar>
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/send-money" 
+            element={
+              <ProtectedRoute>
+                <PageWithNavbar>
+                  <SendMoney />
+                </PageWithNavbar>
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/settings" 
+            element={
+              <ProtectedRoute>
+                <PageWithNavbar>
+                  <Settings />
+                </PageWithNavbar>
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/contacts" 
+            element={
+              <ProtectedRoute>
+                <PageWithNavbar>
+                  <Contacts />
+                </PageWithNavbar>
+              </ProtectedRoute>
+            } 
+          />
 
           {/* DEFAULT */}
           <Route path="/" element={<Navigate to="/login" replace />} />
