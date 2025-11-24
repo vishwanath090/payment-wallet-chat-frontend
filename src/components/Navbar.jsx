@@ -1,373 +1,189 @@
 // components/Navbar.js
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
 
 const Navbar = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const navRef = useRef(null);
+
   const [isOpen, setIsOpen] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const [currentPath, setCurrentPath] = useState(window.location.pathname);
-  const [position, setPosition] = useState(currentPath === '/dashboard' ? "bottom-center" : "top-right");
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const navbarRef = useRef(null);
 
-  // Manual route tracking
-  useEffect(() => {
-    const handleRouteChange = () => {
-      const newPath = window.location.pathname;
-      console.log('🔄 Route changed to:', newPath);
-      setCurrentPath(newPath);
-      
-      // Auto-position based on route
-      if (newPath === '/dashboard') {
-        setPosition("bottom-center");
-      } else {
-        setPosition("top-right");
-      }
-    };
+  /* ------------------------------
+      FORCE POSITION FUNCTION
+  ------------------------------ */
+  const forcePosition = (pos) => {
+    const el = navRef.current;
+    if (!el) return;
 
-    handleRouteChange();
-    window.addEventListener('popstate', handleRouteChange);
-    window.addEventListener('custom-route-change', handleRouteChange);
+    el.style.position = "fixed";
+    el.style.zIndex = "999999";
+    el.style.transition = "all 0.35s ease";
 
-    return () => {
-      window.removeEventListener('popstate', handleRouteChange);
-      window.removeEventListener('custom-route-change', handleRouteChange);
-    };
-  }, []);
+    // Clear old
+    el.style.top = "";
+    el.style.bottom = "";
+    el.style.left = "";
+    el.style.right = "";
+    el.style.transform = "";
 
-  // Drag functionality
-  const handleMouseDown = (e) => {
-    if (!e.target.closest('button')) {
-      setIsDragging(true);
-      setDragStart({
-        x: e.clientX,
-        y: e.clientY
-      });
-      e.preventDefault();
+    if (pos === "bottom-center") {
+      el.style.bottom = "25px";
+      el.style.left = "50%";
+      el.style.transform = "translateX(-50%)";
+    } else if (pos === "top-right") {
+      el.style.top = "20px";
+      el.style.right = "20px";
+    } else if (pos === "top-left") {
+      el.style.top = "20px";
+      el.style.left = "20px";
     }
+  };
+
+  /* ------------------------------
+      AUTO POSITION ON ROUTE CHANGE
+  ------------------------------ */
+  useEffect(() => {
+    if (location.pathname === "/dashboard") {
+      forcePosition("bottom-center");
+    } else {
+      forcePosition("top-right");
+    }
+  }, [location.pathname]);
+
+  /* ------------------------------
+      DRAG LOGIC
+  ------------------------------ */
+
+  const startDrag = (x) => {
+    setIsDragging(true);
+    setDragStart({ x });
+  };
+
+  const handleMouseDown = (e) => {
+    if (!e.target.closest("button")) startDrag(e.clientX);
   };
 
   const handleMouseMove = (e) => {
     if (!isDragging) return;
+    const dx = e.clientX - dragStart.x;
 
-    const deltaX = e.clientX - dragStart.x;
-
-    if (Math.abs(deltaX) > 50) {
-      if (deltaX > 0) {
-        // Drag right - switch positions
-        if (position.includes('left')) setPosition('bottom-center');
-        else if (position.includes('center')) setPosition('bottom-right');
-        else if (position.includes('right')) setPosition('bottom-left');
-      } else {
-        // Drag left - switch positions
-        if (position.includes('left')) setPosition('bottom-right');
-        else if (position.includes('center')) setPosition('bottom-left');
-        else if (position.includes('right')) setPosition('bottom-center');
-      }
-      setIsDragging(false);
-    }
+    if (dx > 50) forcePosition("top-right");
+    if (dx < -50) forcePosition("top-left");
   };
 
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
+  const endDrag = () => setIsDragging(false);
 
-  // Touch events for mobile
-  const handleTouchStart = (e) => {
-    if (!e.target.closest('button')) {
-      const touch = e.touches[0];
-      setIsDragging(true);
-      setDragStart({
-        x: touch.clientX,
-        y: touch.clientY
-      });
-    }
-  };
-
-  const handleTouchMove = (e) => {
-    if (!isDragging) return;
-    const touch = e.touches[0];
-    const deltaX = touch.clientX - dragStart.x;
-
-    if (Math.abs(deltaX) > 60) {
-      if (deltaX > 0) {
-        if (position.includes('left')) setPosition('bottom-center');
-        else if (position.includes('center')) setPosition('bottom-right');
-        else if (position.includes('right')) setPosition('bottom-left');
-      } else {
-        if (position.includes('left')) setPosition('bottom-right');
-        else if (position.includes('center')) setPosition('bottom-left');
-        else if (position.includes('right')) setPosition('bottom-center');
-      }
-      setIsDragging(false);
-    }
-  };
-
-  const handleTouchEnd = () => {
-    setIsDragging(false);
-  };
-
-  // Event listeners for dragging
   useEffect(() => {
     if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-      document.addEventListener('touchmove', handleTouchMove, { passive: false });
-      document.addEventListener('touchend', handleTouchEnd);
-      document.body.style.cursor = 'grabbing';
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", endDrag);
     } else {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('touchend', handleTouchEnd);
-      document.body.style.cursor = '';
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", endDrag);
     }
+  }, [isDragging]);
 
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('touchend', handleTouchEnd);
-      document.body.style.cursor = '';
-    };
-  }, [isDragging, dragStart]);
+  /* ------------------------------
+      UI
+  ------------------------------ */
 
-  // Manual navigation
   const navigateTo = (path) => {
-    if (path === 'logout') {
-      console.log('Logging out...');
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
-      return;
-    }
-
-    console.log('Navigating to:', path);
-    window.history.pushState({}, '', path);
-    setCurrentPath(path);
-    window.dispatchEvent(new Event('custom-route-change'));
+    navigate(path);
     setIsOpen(false);
-  };
-
-  // Only 3 main buttons like before
-  const navItems = [
-    { path: "/dashboard", icon: "🏠", label: "Home" },
-    { path: "/history", icon: "📊", label: "History" },
-  ];
-
-  // Navbar positioning
-  const getNavbarStyle = () => {
-    const baseStyle = {
-      position: "fixed",
-      background: "rgba(255,255,255,0.15)",
-      backdropFilter: "blur(20px)",
-      border: "1px solid rgba(255,255,255,0.3)",
-      borderRadius: "25px",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      padding: "20px 12px",
-      zIndex: 1000,
-      boxShadow: "0 20px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.4)",
-      transition: isDragging ? 'none' : 'all 0.3s ease',
-      cursor: isDragging ? 'grabbing' : 'grab',
-      minHeight: '70px',
-      touchAction: 'none',
-    };
-
-    switch (position) {
-      case "bottom-left":
-        return { ...baseStyle, bottom: "20px", left: "20px" };
-      case "bottom-center":
-        return { ...baseStyle, bottom: "20px", left: "50%", transform: "translateX(-50%)" };
-      case "bottom-right":
-        return { ...baseStyle, bottom: "20px", right: "20px" };
-      case "top-left":
-        return { ...baseStyle, top: "20px", left: "20px" };
-      case "top-center":
-        return { ...baseStyle, top: "20px", left: "50%", transform: "translateX(-50%)" };
-      case "top-right":
-        return { ...baseStyle, top: "20px", right: "20px" };
-      default:
-        return currentPath === '/dashboard' 
-          ? { ...baseStyle, bottom: "20px", left: "50%", transform: "translateX(-50%)" }
-          : { ...baseStyle, top: "20px", right: "20px" };
-    }
   };
 
   return (
     <>
-      {/* Backdrop */}
       {isOpen && (
         <div
           style={{
             position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
+            inset: 0,
             background: "rgba(0,0,0,0.45)",
-            backdropFilter: "blur(4px)",
             zIndex: 900,
+            backdropFilter: "blur(4px)",
           }}
           onClick={() => setIsOpen(false)}
         />
       )}
 
-      <nav 
-        ref={navbarRef}
-        style={getNavbarStyle()}
+      <nav
+        ref={navRef}
         onMouseDown={handleMouseDown}
-        onTouchStart={handleTouchStart}
+        style={{
+          background: "rgba(255,255,255,0.15)",
+          padding: "16px 20px",
+          borderRadius: "25px",
+          display: "flex",
+          gap: "12px",
+          backdropFilter: "blur(20px)",
+          cursor: isDragging ? "grabbing" : "grab",
+        }}
       >
-        {/* 3-line drag handle */}
-        <div 
-          className="drag-handle"
-          style={{
-            position: 'absolute',
-            top: '8px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '30px',
-            height: '12px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            cursor: 'grab',
-            zIndex: 10,
-          }}
-        >
-          <div style={{
-            width: '100%',
-            height: '2px',
-            background: 'rgba(255,255,255,0.6)',
-            borderRadius: '1px',
-          }} />
-          <div style={{
-            width: '100%',
-            height: '2px',
-            background: 'rgba(255,255,255,0.6)',
-            borderRadius: '1px',
-          }} />
-          <div style={{
-            width: '100%',
-            height: '2px',
-            background: 'rgba(255,255,255,0.6)',
-            borderRadius: '1px',
-          }} />
-        </div>
-
-        {/* Home Button */}
-        <div style={{ position: 'relative', marginTop: '15px', marginBottom: '16px' }}>
-          <button
-            onClick={() => navigateTo("/dashboard")}
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              background: currentPath === "/dashboard" 
-                ? "rgba(139, 92, 246, 0.3)" 
-                : "transparent",
-              border: currentPath === "/dashboard" 
-                ? "1px solid rgba(255,255,255,0.4)" 
-                : "1px solid transparent",
-              color: "white",
-              padding: "16px 12px",
-              borderRadius: "18px",
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              minHeight: '70px',
-              minWidth: '70px',
-              justifyContent: 'center',
-            }}
-          >
-            <div style={{ fontSize: "22px", marginBottom: "6px" }}>🏠</div>
-            <span style={{ fontSize: "11px", fontWeight: "700" }}>Home</span>
-          </button>
-        </div>
-
-        {/* History Button */}
-        <div style={{ position: 'relative', marginBottom: '16px' }}>
-          <button
-            onClick={() => navigateTo("/history")}
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              background: currentPath === "/history" 
-                ? "rgba(59, 130, 246, 0.3)" 
-                : "transparent",
-              border: currentPath === "/history" 
-                ? "1px solid rgba(255,255,255,0.4)" 
-                : "1px solid transparent",
-              color: "white",
-              padding: "16px 12px",
-              borderRadius: "18px",
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              minHeight: '70px',
-              minWidth: '70px',
-              justifyContent: 'center',
-            }}
-          >
-            <div style={{ fontSize: "22px", marginBottom: "6px" }}>📊</div>
-            <span style={{ fontSize: "11px", fontWeight: "700" }}>History</span>
-          </button>
-        </div>
-
-        {/* Separator */}
-        <div style={{
-          width: '30px',
-          height: '1px',
-          background: 'rgba(255,255,255,0.2)',
-          margin: '8px 0 16px 0',
-          borderRadius: '1px',
-        }} />
-
-        {/* Logout Button */}
         <button
-          onClick={() => navigateTo("logout")}
+          onClick={() => setIsOpen(!isOpen)}
           style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            background: "rgba(239, 68, 68, 0.3)",
-            border: "1px solid rgba(255,255,255,0.3)",
+            width: "56px",
+            height: "56px",
+            borderRadius: "50%",
+            border: "none",
+            fontSize: "24px",
             color: "white",
-            padding: "16px 12px",
-            borderRadius: "18px",
             cursor: "pointer",
-            transition: "all 0.3s ease",
-            minHeight: '70px',
-            minWidth: '70px',
-            justifyContent: 'center',
+            background: "linear-gradient(135deg,#8b5cf6,#3b82f6)",
           }}
         >
-          <div style={{ fontSize: "22px", marginBottom: "6px" }}>🚪</div>
-          <span style={{ fontSize: "11px", fontWeight: "700" }}>Logout</span>
+          {isOpen ? "✕" : "☰"}
         </button>
 
-        {/* Glass morphism overlay */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.1) 100%)',
-          borderRadius: '25px',
-          zIndex: -1
-        }} />
-      </nav>
+        {isOpen && (
+          <div style={{ display: "flex", gap: "12px" }}>
+            <button
+              onClick={() => navigateTo("/dashboard")}
+              style={{
+                background: "rgba(255,255,255,0.2)",
+                padding: "12px 16px",
+                borderRadius: "14px",
+                color: "white",
+                border: "1px solid rgba(255,255,255,0.3)",
+              }}
+            >
+              🏠 Home
+            </button>
 
-      <style>
-        {`
-          @media (max-width: 768px) {
-            nav {
-              padding: 16px 8px;
-            }
-          }
-        `}
-      </style>
+            <button
+              onClick={() => navigateTo("/history")}
+              style={{
+                background: "rgba(255,255,255,0.2)",
+                padding: "12px 16px",
+                borderRadius: "14px",
+                color: "white",
+                border: "1px solid rgba(255,255,255,0.3)",
+              }}
+            >
+              📊 History
+            </button>
+
+            <button
+              onClick={logout}
+              style={{
+                background: "rgba(239,68,68,0.8)",
+                padding: "12px 16px",
+                borderRadius: "14px",
+                color: "white",
+              }}
+            >
+              🚪 Logout
+            </button>
+          </div>
+        )}
+      </nav>
     </>
   );
 };
