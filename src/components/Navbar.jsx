@@ -1,5 +1,5 @@
 // components/Navbar.js
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 
@@ -10,25 +10,16 @@ const Navbar = () => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [position, setPosition] = useState("bottom-center");
-  const navbarRef = useRef(null);
 
-  // 🔥 FIXED: Auto position based on page
+  // 🔥 SIMPLE AND RELIABLE: Set position based on current page
   useEffect(() => {
-    console.log('Page changed to:', location.pathname);
-    
+    // Always set position when component mounts or route changes
     if (location.pathname === '/dashboard') {
-      console.log('Setting position to bottom-center');
       setPosition("bottom-center");
     } else {
-      console.log('Setting position to top-left');
-      setPosition("top-left");
+      setPosition("top-right"); // Changed from top-left to top-right
     }
-  }, [location.pathname]); // This will run every time the route changes
-
-  // Save position to localStorage when it changes
-  useEffect(() => {
-    localStorage.setItem("navbarPosition", position);
-  }, [position]);
+  }, [location.pathname]); // This runs every time the route changes
 
   const handleLogout = () => {
     logout();
@@ -54,7 +45,7 @@ const Navbar = () => {
     setIsOpen(false);
   };
 
-  // 🔥 SIMPLE POSITIONING - No dragging for now
+  // 🔥 SIMPLE POSITIONING - No localStorage, no dragging
   const getNavbarStyle = () => {
     const base = {
       position: "fixed",
@@ -67,29 +58,25 @@ const Navbar = () => {
       alignItems: "center",
       gap: "12px",
       zIndex: 1000,
-      transition: "all 0.45s cubic-bezier(0.4, 0, 0.2, 1)",
+      transition: "all 0.45s ease",
       boxShadow: "0 20px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.4)",
       minHeight: "70px",
     };
 
-    // Debug current position
-    console.log('Current navbar position:', position);
-
-    switch (position) {
-      case "top-left":
-        return { ...base, top: "20px", left: "20px" };
-      case "top-center":
-        return { ...base, top: "20px", left: "50%", transform: "translateX(-50%)" };
-      case "top-right":
-        return { ...base, top: "20px", right: "20px" };
-      case "bottom-left":
-        return { ...base, bottom: "20px", left: "20px" };
-      case "bottom-center":
-        return { ...base, bottom: "20px", left: "50%", transform: "translateX(-50%)" };
-      case "bottom-right":
-        return { ...base, bottom: "20px", right: "20px" };
-      default:
-        return { ...base, bottom: "20px", left: "50%", transform: "translateX(-50%)" };
+    // Only two positions now
+    if (position === "bottom-center") {
+      return { 
+        ...base, 
+        bottom: "20px", 
+        left: "50%", 
+        transform: "translateX(-50%)" 
+      };
+    } else {
+      return { 
+        ...base, 
+        top: "20px", 
+        right: "20px"  // Top-right position
+      };
     }
   };
 
@@ -112,26 +99,7 @@ const Navbar = () => {
         />
       )}
 
-      {/* Position Debug Info */}
-      <div style={{
-        position: 'fixed',
-        top: '10px',
-        left: '10px',
-        background: 'rgba(0,0,0,0.8)',
-        color: 'white',
-        padding: '10px',
-        borderRadius: '5px',
-        fontSize: '12px',
-        zIndex: 1001,
-      }}>
-        Page: {location.pathname}<br/>
-        Navbar: {position}
-      </div>
-
-      <nav
-        ref={navbarRef}
-        style={getNavbarStyle()}
-      >
+      <nav style={getNavbarStyle()}>
         {/* Main button */}
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -173,14 +141,10 @@ const Navbar = () => {
           backdropFilter: 'blur(10px)',
         }}>
           <span style={{ fontSize: '14px' }}>
-            {position === 'top-left' ? '↖️' : 
-             position === 'top-center' ? '⬆️' :
-             position === 'top-right' ? '↗️' :
-             position === 'bottom-left' ? '↙️' : 
-             position === 'bottom-center' ? '⬇️' : '↘️'}
+            {position === 'bottom-center' ? '⬇️' : '↗️'}
           </span>
           <span style={{ textTransform: 'capitalize' }}>
-            {position.replace('-', ' ')}
+            {position === 'bottom-center' ? 'bottom center' : 'top right'}
           </span>
         </div>
 
@@ -189,7 +153,7 @@ const Navbar = () => {
           <div style={{ 
             display: "flex", 
             gap: "12px",
-            animation: "slideInRight 0.3s ease",
+            animation: "slideIn 0.3s ease",
             flexWrap: 'wrap',
           }}>
             {navItems.map((item) => (
@@ -251,10 +215,10 @@ const Navbar = () => {
 
       <style>
         {`
-          @keyframes slideInRight {
+          @keyframes slideIn {
             from {
               opacity: 0;
-              transform: translateX(-20px);
+              transform: translateX(-10px);
             }
             to {
               opacity: 1;
