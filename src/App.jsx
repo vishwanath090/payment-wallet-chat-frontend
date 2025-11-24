@@ -98,7 +98,8 @@ function App() {
       overflowX: 'hidden',
       minHeight: '100vh'
     }}>
-      {isAuthenticated && <Navbar />}
+      {/* 🔥 FIX: Only render Navbar when authenticated AND not loading */}
+      {isAuthenticated && !loading && <Navbar />}
 
       <main style={{ 
         margin: 0, 
@@ -135,7 +136,7 @@ function App() {
             }
           />
 
-          {/* PROTECTED ROUTES - With draggable navbar */}
+          {/* PROTECTED ROUTES - With navbar */}
           <Route 
             path="/dashboard" 
             element={
