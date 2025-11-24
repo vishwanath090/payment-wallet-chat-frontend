@@ -28,12 +28,12 @@ const Navbar = () => {
     }
   }, []);
 
+  // Mouse events for desktop
   const handleMouseDown = (e) => {
-    // Only start dragging if clicking on the navbar background or drag handle
-    const isDragHandle = e.target.closest('.drag-handle');
-    const isNavbarBackground = e.target === navbarRef.current;
+    // Only start dragging if clicking on the drag handle specifically
+    const isDragHandle = e.target.classList.contains('drag-handle');
     
-    if (isDragHandle || isNavbarBackground) {
+    if (isDragHandle) {
       setIsDragging(true);
       setDragStart({
         x: e.clientX - position.x,
@@ -49,7 +49,53 @@ const Navbar = () => {
     const x = e.clientX - dragStart.x;
     const y = e.clientY - dragStart.y;
 
-    // Boundary checks to keep navbar within viewport
+    updatePosition(x, y);
+  };
+
+  const handleMouseUp = () => {
+    if (isDragging) {
+      setIsDragging(false);
+      // Save position to localStorage
+      localStorage.setItem('navbarPosition', JSON.stringify(position));
+    }
+  };
+
+  // Touch events for mobile
+  const handleTouchStart = (e) => {
+    const touch = e.touches[0];
+    const isDragHandle = e.target.classList.contains('drag-handle');
+    
+    if (isDragHandle) {
+      setIsDragging(true);
+      setDragStart({
+        x: touch.clientX - position.x,
+        y: touch.clientY - position.y
+      });
+      e.preventDefault();
+    }
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isDragging) return;
+
+    const touch = e.touches[0];
+    const x = touch.clientX - dragStart.x;
+    const y = touch.clientY - dragStart.y;
+
+    updatePosition(x, y);
+    e.preventDefault();
+  };
+
+  const handleTouchEnd = () => {
+    if (isDragging) {
+      setIsDragging(false);
+      // Save position to localStorage
+      localStorage.setItem('navbarPosition', JSON.stringify(position));
+    }
+  };
+
+  // Common position update function
+  const updatePosition = (x, y) => {
     const navbar = navbarRef.current;
     if (!navbar) return;
 
@@ -62,33 +108,46 @@ const Navbar = () => {
     setPosition({ x: boundedX, y: boundedY });
   };
 
-  const handleMouseUp = () => {
-    if (isDragging) {
-      setIsDragging(false);
-      // Save position to localStorage
-      localStorage.setItem('navbarPosition', JSON.stringify(position));
-    }
-  };
-
   // Add event listeners for dragging
   useEffect(() => {
     if (isDragging) {
+      // Mouse events
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
+      
+      // Touch events
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      document.addEventListener('touchend', handleTouchEnd);
+      
       document.body.style.cursor = 'grabbing';
       document.body.style.userSelect = 'none';
+      document.body.style.touchAction = 'none';
     } else {
+      // Mouse events
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
+      
+      // Touch events
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+      
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
+      document.body.style.touchAction = '';
     }
 
     return () => {
+      // Cleanup mouse events
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
+      
+      // Cleanup touch events
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+      
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
+      document.body.style.touchAction = '';
     };
   }, [isDragging, dragStart]);
 
@@ -106,11 +165,6 @@ const Navbar = () => {
       logout();
       navigate('/login');
     }, 300);
-  };
-
-  const handleLinkClick = (e) => {
-    // Allow link clicks to work normally
-    e.stopPropagation();
   };
 
   const navItems = [
@@ -142,12 +196,12 @@ const Navbar = () => {
         transition: isDragging ? 'none' : 'all 0.3s ease',
         animation: 'navbarSlideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
         overflow: 'hidden',
-        cursor: isDragging ? 'grabbing' : 'default',
+        cursor: 'default',
+        touchAction: 'none', // Important for mobile dragging
       }}
-      onMouseDown={handleMouseDown}
     >
       
-      {/* Drag Handle Indicator */}
+      {/* Drag Handle Indicator - Works on both desktop and mobile */}
       <div 
         className="drag-handle"
         style={{
@@ -159,9 +213,13 @@ const Navbar = () => {
           height: '4px',
           background: 'rgba(255, 255, 255, 0.4)',
           borderRadius: '2px',
-          cursor: 'grab',
-          transition: 'all 0.3s ease'
+          cursor: isDragging ? 'grabbing' : 'grab',
+          transition: 'all 0.3s ease',
+          zIndex: 10,
+          touchAction: 'none', // Important for mobile
         }} 
+        onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
         onMouseEnter={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.6)'}
         onMouseLeave={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.4)'}
       />
@@ -220,7 +278,6 @@ const Navbar = () => {
 
           <Link
             to={item.path}
-            onClick={handleLinkClick}
             style={{
               display: 'flex',
               flexDirection: 'column',
@@ -246,10 +303,11 @@ const Navbar = () => {
                 activeHover === index ? 
                 `0 20px 40px rgba(0, 0, 0, 0.4), 0 0 25px ${item.color.replace('0.3', '0.3')}` :
                 'none',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              WebkitTapHighlightColor: 'transparent', // Remove mobile tap highlight
             }}
-            onMouseEnter={() => !isDragging && setActiveHover(index)}
-            onMouseLeave={() => !isDragging && setActiveHover(null)}
+            onMouseEnter={() => setActiveHover(index)}
+            onMouseLeave={() => setActiveHover(null)}
           >
             <div style={{
               fontSize: '22px',
@@ -308,10 +366,11 @@ const Navbar = () => {
           transform: activeHover === 'logout' ? 'scale(1.1)' : 'scale(1)',
           boxShadow: activeHover === 'logout' ? 
             '0 20px 40px rgba(0, 0, 0, 0.4), 0 0 25px rgba(239, 68, 68, 0.4)' : 
-            'none'
+            'none',
+          WebkitTapHighlightColor: 'transparent', // Remove mobile tap highlight
         }}
-        onMouseEnter={() => !isDragging && setActiveHover('logout')}
-        onMouseLeave={() => !isDragging && setActiveHover(null)}
+        onMouseEnter={() => setActiveHover('logout')}
+        onMouseLeave={() => setActiveHover(null)}
       >
         <div style={{
           fontSize: '22px',
@@ -354,22 +413,41 @@ const Navbar = () => {
             }
           }
 
+          /* Mobile responsiveness */
           @media (max-width: 768px) {
             nav {
               padding: 16px 8px;
+              transform: scale(0.9); /* Slightly smaller on mobile */
+              transform-origin: center;
+            }
+            
+            .drag-handle {
+              width: 40px; /* Larger touch target on mobile */
+              height: 6px;
+            }
+          }
+
+          @media (max-width: 480px) {
+            nav {
+              padding: 14px 6px;
+              transform: scale(0.85);
             }
           }
 
           /* Prevent text selection during drag */
-          nav {
-            user-select: none;
+          * {
             -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
           }
 
-          /* Allow text selection in buttons and links */
-          button, a {
-            user-select: none;
-            -webkit-user-select: none;
+          /* Allow text selection in inputs if needed */
+          input, textarea {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
           }
         `}
       </style>
