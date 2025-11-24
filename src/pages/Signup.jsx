@@ -16,6 +16,133 @@ const Signup = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
+  // Common passwords to block
+  const commonPasswords = [
+    '123456', 'password', '12345678', 'qwerty', '123456789',
+    '12345', '1234', '111111', '1234567', 'dragon', '123123',
+    'admin', 'letmein', 'welcome', 'monkey', 'password1',
+    'abc123', '1234567890', 'qwerty123', '1q2w3e4r', 'baseball',
+    'sunshine', 'princess', 'football', 'shadow', 'master'
+  ];
+
+  // Password strength validation
+  const validatePassword = (password) => {
+    const minLength = 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    
+    return {
+      isValid: password.length >= minLength && hasUpperCase && 
+               hasLowerCase && hasNumbers && hasSpecialChar,
+      requirements: {
+        minLength: password.length >= minLength,
+        hasUpperCase,
+        hasLowerCase,
+        hasNumbers,
+        hasSpecialChar
+      }
+    };
+  };
+
+  // Check if password is common
+  const isCommonPassword = (password) => {
+    return commonPasswords.includes(password.toLowerCase());
+  };
+
+  // Password Strength Indicator Component
+  const PasswordStrength = ({ password }) => {
+    const getStrength = (pwd) => {
+      if (!pwd) return 0;
+      
+      let score = 0;
+      if (pwd.length >= 8) score++;
+      if (/[A-Z]/.test(pwd)) score++;
+      if (/[a-z]/.test(pwd)) score++;
+      if (/\d/.test(pwd)) score++;
+      if (/[!@#$%^&*(),.?":{}|<>]/.test(pwd)) score++;
+      
+      // Bonus points for length
+      if (pwd.length >= 12) score++;
+      
+      return Math.min(score, 5); // Max score 5
+    };
+
+    const strength = getStrength(password);
+    const colors = ['#ef4444', '#f59e0b', '#f59e0b', '#84cc16', '#10b981', '#10b981'];
+    const labels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong', 'Very Strong'];
+    const width = password ? `${(strength / 5) * 100}%` : '0%';
+
+    return (
+      <div style={{ marginTop: '8px' }}>
+        <div style={{
+          height: '4px',
+          background: '#374151',
+          borderRadius: '2px',
+          overflow: 'hidden',
+          marginBottom: '4px'
+        }}>
+          <div style={{
+            width: width,
+            height: '100%',
+            background: colors[strength],
+            transition: 'all 0.3s ease',
+            borderRadius: '2px'
+          }} />
+        </div>
+        <small style={{ 
+          color: password ? colors[strength] : '#94a3b8', 
+          fontSize: '12px',
+          display: 'block',
+          textAlign: 'center'
+        }}>
+          {password ? `Password Strength: ${labels[strength]}` : 'Enter a password to see strength'}
+        </small>
+      </div>
+    );
+  };
+
+  // Password Requirements Component
+  const PasswordRequirements = ({ password }) => {
+    const validation = validatePassword(password);
+    
+    const requirements = [
+      { text: 'At least 8 characters', met: validation.requirements.minLength },
+      { text: 'Uppercase letter (A-Z)', met: validation.requirements.hasUpperCase },
+      { text: 'Lowercase letter (a-z)', met: validation.requirements.hasLowerCase },
+      { text: 'Number (0-9)', met: validation.requirements.hasNumbers },
+      { text: 'Special character (!@#$%)', met: validation.requirements.hasSpecialChar },
+      { text: 'Not a common password', met: !isCommonPassword(password) }
+    ];
+
+    return (
+      <div style={{ marginTop: '12px' }}>
+        {requirements.map((req, index) => (
+          <div key={index} style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            marginBottom: '4px',
+            fontSize: '11px'
+          }}>
+            <span style={{
+              color: req.met ? '#10b981' : '#ef4444',
+              marginRight: '6px',
+              fontSize: '12px'
+            }}>
+              {req.met ? '✓' : '✗'}
+            </span>
+            <span style={{ 
+              color: req.met ? '#10b981' : '#94a3b8'
+            }}>
+              {req.text}
+            </span>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -34,6 +161,21 @@ const Signup = () => {
     setIsLoading(true);
     setMsg("");
 
+    // Validate password strength
+    const passwordValidation = validatePassword(formData.password);
+    if (!passwordValidation.isValid) {
+      setMsg("error: Please ensure your password meets all the requirements below.");
+      setIsLoading(false);
+      return;
+    }
+
+    // Check for common passwords
+    if (isCommonPassword(formData.password)) {
+      setMsg("error: This password is too common and easily guessable. Please choose a stronger, unique password.");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       await api.post("/auth/signup", {
         full_name: formData.fullName,
@@ -42,7 +184,7 @@ const Signup = () => {
         pin: formData.pin
       });
 
-      setMsg("success: Account created successfully! Redirecting...");
+      setMsg("success: Account created successfully! Redirecting to login...");
       setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
       setMsg(
@@ -91,7 +233,7 @@ const Signup = () => {
 
       <div className="glass-card"
         style={{
-          maxWidth: "400px",
+          maxWidth: "450px",
           width: "100%",
           textAlign: "center",
           background: "rgba(30, 30, 46, 0.7)",
@@ -163,7 +305,7 @@ const Signup = () => {
             </h1>
 
             <p style={{ color: "#94a3b8", fontSize: "14px", letterSpacing: "0.5px" }}>
-              Create your digital wallet
+              Create your secure digital wallet
             </p>
           </div>
 
@@ -178,7 +320,7 @@ const Signup = () => {
                 onChange={handleChange}
                 placeholder="Full Name"
                 required
-                autoComplete="off"
+                autoComplete="name"
                 spellCheck="false"
                 style={{ 
                   textAlign: "center",
@@ -204,7 +346,6 @@ const Signup = () => {
                   e.target.style.boxShadow = "none";
                   e.target.style.transform = "scale(1)";
                 }}
-                placeholderTextColor="#94a3b8"
               />
             </div>
 
@@ -243,7 +384,6 @@ const Signup = () => {
                   e.target.style.boxShadow = "none";
                   e.target.style.transform = "scale(1)";
                 }}
-                placeholderTextColor="#94a3b8"
               />
             </div>
 
@@ -254,7 +394,7 @@ const Signup = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                placeholder="Create Password"
+                placeholder="Create Strong Password"
                 required
                 autoComplete="new-password"
                 spellCheck="false"
@@ -282,8 +422,9 @@ const Signup = () => {
                   e.target.style.boxShadow = "none";
                   e.target.style.transform = "scale(1)";
                 }}
-                placeholderTextColor="#94a3b8"
               />
+              <PasswordStrength password={formData.password} />
+              <PasswordRequirements password={formData.password} />
             </div>
 
             {/* PIN */}
@@ -323,7 +464,6 @@ const Signup = () => {
                   e.target.style.boxShadow = "none";
                   e.target.style.transform = "scale(1)";
                 }}
-                placeholderTextColor="#94a3b8"
               />
               <small
                 style={{
@@ -383,13 +523,14 @@ const Signup = () => {
                 transform: isHovered ? "scale(1.05) translateY(-2px)" : "scale(1)",
                 boxShadow: isHovered 
                   ? "0 15px 30px rgba(102, 126, 234, 0.4)" 
-                  : "0 8px 25px rgba(102, 126, 234, 0.3)"
+                  : "0 8px 25px rgba(102, 126, 234, 0.3)",
+                opacity: isLoading ? 0.7 : 1
               }}
               disabled={isLoading}
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
-              {isLoading ? "⏳ Creating Account..." : "🎉 Create Account"}
+              {isLoading ? "⏳ Creating Secure Account..." : "🎉 Create Secure Account"}
             </button>
           </form>
 
