@@ -9,24 +9,36 @@ const Navbar = () => {
   const { logout } = useAuth();
   const [activeHover, setActiveHover] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [position, setPosition] = useState({ x: 20, y: '50%' });
-  const [transform, setTransform] = useState('translateY(-50%)');
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const navbarRef = useRef(null);
 
-  // Initialize position from localStorage or default
+  // Initialize position to center top of the page
   useEffect(() => {
     const savedPosition = localStorage.getItem('navbarPosition');
     if (savedPosition) {
       const { x, y } = JSON.parse(savedPosition);
       setPosition({ x, y });
-      setTransform(`translate(${x}px, ${y}px)`);
+    } else {
+      // Default position: centered at top
+      const navbarWidth = 94; // Approximate width of navbar
+      const x = (window.innerWidth - navbarWidth) / 2;
+      const y = 20; // 20px from top
+      setPosition({ x, y });
     }
   }, []);
 
   const handleMouseDown = (e) => {
-    // Only start dragging if clicking on the navbar background, not buttons
-    if (e.target === navbarRef.current || e.target.closest('nav') === navbarRef.current) {
+    // Only start dragging if clicking on the navbar background or drag handle
+    const isDragHandle = e.target.closest('.drag-handle');
+    const isNavbarBackground = e.target === navbarRef.current;
+    
+    if (isDragHandle || isNavbarBackground) {
       setIsDragging(true);
+      setDragStart({
+        x: e.clientX - position.x,
+        y: e.clientY - position.y
+      });
       e.preventDefault();
     }
   };
@@ -34,21 +46,20 @@ const Navbar = () => {
   const handleMouseMove = (e) => {
     if (!isDragging) return;
 
+    const x = e.clientX - dragStart.x;
+    const y = e.clientY - dragStart.y;
+
+    // Boundary checks to keep navbar within viewport
     const navbar = navbarRef.current;
     if (!navbar) return;
 
     const rect = navbar.getBoundingClientRect();
-    const x = e.clientX - rect.width / 2;
-    const y = e.clientY - rect.height / 2;
-
-    // Boundary checks to keep navbar within viewport
     const maxX = window.innerWidth - rect.width - 10;
     const maxY = window.innerHeight - rect.height - 10;
     const boundedX = Math.max(10, Math.min(x, maxX));
     const boundedY = Math.max(10, Math.min(y, maxY));
 
     setPosition({ x: boundedX, y: boundedY });
-    setTransform(`translate(${boundedX}px, ${boundedY}px)`);
   };
 
   const handleMouseUp = () => {
@@ -79,19 +90,27 @@ const Navbar = () => {
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
     };
-  }, [isDragging]);
+  }, [isDragging, dragStart]);
 
-  const handleLogout = () => {
+  const handleLogout = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
     const navbar = document.querySelector('nav');
     if (navbar) {
       navbar.style.opacity = '0';
-      navbar.style.transform = `${transform} scale(0.8)`;
+      navbar.style.transform = `scale(0.8)`;
     }
     
     setTimeout(() => {
       logout();
       navigate('/login');
     }, 300);
+  };
+
+  const handleLinkClick = (e) => {
+    // Allow link clicks to work normally
+    e.stopPropagation();
   };
 
   const navItems = [
@@ -104,9 +123,8 @@ const Navbar = () => {
       ref={navbarRef}
       style={{
         position: 'fixed',
-        left: '0',
-        top: '0',
-        transform: transform,
+        left: `${position.x}px`,
+        top: `${position.y}px`,
         background: 'rgba(255, 255, 255, 0.1)',
         backdropFilter: 'blur(25px) saturate(180%)',
         border: '1px solid rgba(255, 255, 255, 0.2)',
@@ -121,29 +139,31 @@ const Navbar = () => {
           inset 0 1px 0 rgba(255, 255, 255, 0.3),
           inset 0 -1px 0 rgba(0, 0, 0, 0.1)
         `,
-        transition: isDragging ? 'none' : 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+        transition: isDragging ? 'none' : 'all 0.3s ease',
         animation: 'navbarSlideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
         overflow: 'hidden',
-        cursor: isDragging ? 'grabbing' : 'grab',
+        cursor: isDragging ? 'grabbing' : 'default',
       }}
       onMouseDown={handleMouseDown}
     >
       
       {/* Drag Handle Indicator */}
-      <div style={{
-        position: 'absolute',
-        top: '8px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: '30px',
-        height: '4px',
-        background: 'rgba(255, 255, 255, 0.4)',
-        borderRadius: '2px',
-        cursor: 'grab',
-        transition: 'all 0.3s ease'
-      }} 
-      onMouseEnter={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.6)'}
-      onMouseLeave={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.4)'}
+      <div 
+        className="drag-handle"
+        style={{
+          position: 'absolute',
+          top: '8px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '30px',
+          height: '4px',
+          background: 'rgba(255, 255, 255, 0.4)',
+          borderRadius: '2px',
+          cursor: 'grab',
+          transition: 'all 0.3s ease'
+        }} 
+        onMouseEnter={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.6)'}
+        onMouseLeave={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.4)'}
       />
 
       {/* Glass Morphism Overlay */}
@@ -200,6 +220,7 @@ const Navbar = () => {
 
           <Link
             to={item.path}
+            onClick={handleLinkClick}
             style={{
               display: 'flex',
               flexDirection: 'column',
@@ -225,7 +246,7 @@ const Navbar = () => {
                 activeHover === index ? 
                 `0 20px 40px rgba(0, 0, 0, 0.4), 0 0 25px ${item.color.replace('0.3', '0.3')}` :
                 'none',
-              pointerEvents: isDragging ? 'none' : 'auto'
+              cursor: 'pointer'
             }}
             onMouseEnter={() => !isDragging && setActiveHover(index)}
             onMouseLeave={() => !isDragging && setActiveHover(null)}
@@ -280,15 +301,14 @@ const Navbar = () => {
           color: activeHover === 'logout' ? 'white' : 'rgba(255, 255, 255, 0.8)',
           padding: '16px 12px',
           borderRadius: '18px',
-          cursor: isDragging ? 'grabbing' : 'pointer',
+          cursor: 'pointer',
           transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
           minHeight: '70px',
           minWidth: '70px',
           transform: activeHover === 'logout' ? 'scale(1.1)' : 'scale(1)',
           boxShadow: activeHover === 'logout' ? 
             '0 20px 40px rgba(0, 0, 0, 0.4), 0 0 25px rgba(239, 68, 68, 0.4)' : 
-            'none',
-          pointerEvents: isDragging ? 'none' : 'auto'
+            'none'
         }}
         onMouseEnter={() => !isDragging && setActiveHover('logout')}
         onMouseLeave={() => !isDragging && setActiveHover(null)}
@@ -315,11 +335,11 @@ const Navbar = () => {
           @keyframes navbarSlideIn {
             from {
               opacity: 0;
-              transform: translate(-100px, -50%) scale(0.8);
+              transform: translateY(-20px) scale(0.9);
             }
             to {
               opacity: 1;
-              transform: translate(${position.x}px, ${position.y}) scale(1);
+              transform: translateY(0) scale(1);
             }
           }
 
@@ -340,13 +360,16 @@ const Navbar = () => {
             }
           }
 
-          /* Smooth transitions for non-dragging states */
+          /* Prevent text selection during drag */
           nav {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            user-select: none;
+            -webkit-user-select: none;
           }
 
-          nav:active {
-            cursor: grabbing;
+          /* Allow text selection in buttons and links */
+          button, a {
+            user-select: none;
+            -webkit-user-select: none;
           }
         `}
       </style>

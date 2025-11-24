@@ -17,7 +17,19 @@ const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
-    return <div className="fullscreen-loader">Loading...</div>;
+    return (
+      <div className="fullscreen-loader" style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: 'white',
+        fontSize: '18px'
+      }}>
+        Loading...
+      </div>
+    );
   }
 
   return isAuthenticated ? children : <Navigate to="/login" replace />;
@@ -27,20 +39,33 @@ const PublicRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
-    return <div className="fullscreen-loader">Loading...</div>;
+    return (
+      <div className="fullscreen-loader" style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: 'white',
+        fontSize: '18px'
+      }}>
+        Loading...
+      </div>
+    );
   }
 
   return !isAuthenticated ? children : <Navigate to="/dashboard" replace />;
 };
 
-// Simple wrapper that doesn't add any spacing since navbar is draggable
+// Simple wrapper for pages with navbar
 const PageWithNavbar = ({ children }) => {
   return (
     <div style={{ 
       minHeight: '100vh',
       width: '100%',
       padding: '0',
-      margin: '0'
+      margin: '0',
+      position: 'relative'
     }}>
       {children}
     </div>
@@ -51,14 +76,35 @@ function App() {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
-    return <div className="fullscreen-loader">Initializing...</div>;
+    return (
+      <div className="fullscreen-loader" style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: 'white',
+        fontSize: '18px'
+      }}>
+        Initializing...
+      </div>
+    );
   }
 
   return (
-    <div className="app" style={{ margin: 0, padding: 0, overflowX: 'hidden' }}>
+    <div className="app" style={{ 
+      margin: 0, 
+      padding: 0, 
+      overflowX: 'hidden',
+      minHeight: '100vh'
+    }}>
       {isAuthenticated && <Navbar />}
 
-      <main style={{ margin: 0, padding: 0 }}>
+      <main style={{ 
+        margin: 0, 
+        padding: 0,
+        minHeight: '100vh'
+      }}>
         <Routes>
 
           {/* PUBLIC ROUTES - No navbar */}
@@ -167,7 +213,7 @@ function App() {
             } 
           />
 
-          {/* DEFAULT */}
+          {/* DEFAULT ROUTES */}
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
 
