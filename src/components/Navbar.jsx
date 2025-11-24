@@ -9,24 +9,51 @@ const Navbar = () => {
   const { logout } = useAuth();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [position, setPosition] = useState("bottom-center");
+  const [navbarStyle, setNavbarStyle] = useState({});
 
-  // 🔥 SIMPLE AND RELIABLE: Set position based on current page
+  // 🔥 SIMPLE POSITIONING - This will definitely work
   useEffect(() => {
-    // Always set position when component mounts or route changes
+    console.log('🔄 Page changed to:', location.pathname);
+    
+    const baseStyle = {
+      position: "fixed",
+      background: "rgba(255,255,255,0.15)",
+      backdropFilter: "blur(20px)",
+      border: "1px solid rgba(255,255,255,0.3)",
+      borderRadius: "25px",
+      padding: "16px 20px",
+      display: "flex",
+      alignItems: "center",
+      gap: "12px",
+      zIndex: 1000,
+      transition: "all 0.45s ease",
+      boxShadow: "0 20px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.4)",
+      minHeight: "70px",
+    };
+
     if (location.pathname === '/dashboard') {
-      setPosition("bottom-center");
+      console.log('📍 Setting to BOTTOM-CENTER');
+      setNavbarStyle({
+        ...baseStyle,
+        bottom: "20px",
+        left: "50%",
+        transform: "translateX(-50%)"
+      });
     } else {
-      setPosition("top-right"); // Changed from top-left to top-right
+      console.log('📍 Setting to TOP-RIGHT');
+      setNavbarStyle({
+        ...baseStyle,
+        top: "20px",
+        right: "20px"
+      });
     }
-  }, [location.pathname]); // This runs every time the route changes
+  }, [location.pathname]);
 
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
 
-  // Menu items
   const navItems = [
     { path: "/dashboard", icon: "🏠", label: "Home" },
     { path: "/history", icon: "📊", label: "History" },
@@ -43,41 +70,6 @@ const Navbar = () => {
       navigate(path);
     }
     setIsOpen(false);
-  };
-
-  // 🔥 SIMPLE POSITIONING - No localStorage, no dragging
-  const getNavbarStyle = () => {
-    const base = {
-      position: "fixed",
-      background: "rgba(255,255,255,0.15)",
-      backdropFilter: "blur(20px)",
-      border: "1px solid rgba(255,255,255,0.3)",
-      borderRadius: "25px",
-      padding: "16px 20px",
-      display: "flex",
-      alignItems: "center",
-      gap: "12px",
-      zIndex: 1000,
-      transition: "all 0.45s ease",
-      boxShadow: "0 20px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.4)",
-      minHeight: "70px",
-    };
-
-    // Only two positions now
-    if (position === "bottom-center") {
-      return { 
-        ...base, 
-        bottom: "20px", 
-        left: "50%", 
-        transform: "translateX(-50%)" 
-      };
-    } else {
-      return { 
-        ...base, 
-        top: "20px", 
-        right: "20px"  // Top-right position
-      };
-    }
   };
 
   return (
@@ -99,7 +91,24 @@ const Navbar = () => {
         />
       )}
 
-      <nav style={getNavbarStyle()}>
+      {/* Debug Info - Always visible */}
+      <div style={{
+        position: 'fixed',
+        top: '10px',
+        left: '10px',
+        background: 'rgba(0,0,0,0.9)',
+        color: 'white',
+        padding: '10px',
+        borderRadius: '5px',
+        fontSize: '12px',
+        zIndex: 1001,
+        fontFamily: 'monospace',
+      }}>
+        Page: {location.pathname}<br/>
+        Position: {location.pathname === '/dashboard' ? 'BOTTOM-CENTER' : 'TOP-RIGHT'}
+      </div>
+
+      <nav style={navbarStyle}>
         {/* Main button */}
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -141,10 +150,10 @@ const Navbar = () => {
           backdropFilter: 'blur(10px)',
         }}>
           <span style={{ fontSize: '14px' }}>
-            {position === 'bottom-center' ? '⬇️' : '↗️'}
+            {location.pathname === '/dashboard' ? '⬇️' : '↗️'}
           </span>
           <span style={{ textTransform: 'capitalize' }}>
-            {position === 'bottom-center' ? 'bottom center' : 'top right'}
+            {location.pathname === '/dashboard' ? 'bottom center' : 'top right'}
           </span>
         </div>
 
