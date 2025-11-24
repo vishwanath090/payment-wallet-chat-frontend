@@ -10,6 +10,7 @@ const Signup = () => {
     password: "",
     pin: ""
   });
+
   const [msg, setMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -24,16 +25,19 @@ const Signup = () => {
     e.preventDefault();
     setIsLoading(true);
     setMsg("");
-    
+
     try {
       await api.post("/auth/signup", {
-        full_name: formData.fullName,
+        full_name: formData.fullName,   // FIXED
         email: formData.email,
         password: formData.password,
-        pin: formData.pin,
+        pin: formData.pin              // FIXED
       });
+
       setMsg("success: Account created successfully! Redirecting...");
+
       setTimeout(() => navigate("/login"), 2000);
+
     } catch (err) {
       setMsg("error: " + (err?.response?.data?.detail || "Signup failed. Please try again."));
     } finally {
@@ -42,19 +46,20 @@ const Signup = () => {
   };
 
   return (
-    <div className="container" style={{ 
-      display: "flex", 
-      justifyContent: "center", 
-      alignItems: "center", 
+    <div className="container" style={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
       minHeight: "100vh",
       padding: "20px"
     }}>
-      <div className="glass-card" style={{ 
-        maxWidth: "400px", 
+      <div className="glass-card" style={{
+        maxWidth: "400px",
         width: "100%",
         textAlign: "center"
       }}>
-        {/* App Logo/Header */}
+
+        {/* Header */}
         <div style={{ marginBottom: "32px" }}>
           <div style={{
             width: "80px",
@@ -70,15 +75,19 @@ const Signup = () => {
           }}>
             👤
           </div>
+
           <h1 style={{ fontSize: "28px", fontWeight: "700", marginBottom: "8px" }}>
             Join WalletPay
           </h1>
+
           <p style={{ color: "var(--text-secondary)" }}>
             Create your digital wallet
           </p>
         </div>
 
+        {/* Form */}
         <form onSubmit={handleSignup}>
+          {/* Full Name */}
           <div className="form-group">
             <input
               name="fullName"
@@ -91,6 +100,7 @@ const Signup = () => {
             />
           </div>
 
+          {/* Email */}
           <div className="form-group">
             <input
               type="email"
@@ -104,6 +114,7 @@ const Signup = () => {
             />
           </div>
 
+          {/* Password */}
           <div className="form-group">
             <input
               type="password"
@@ -117,6 +128,7 @@ const Signup = () => {
             />
           </div>
 
+          {/* PIN */}
           <div className="form-group">
             <input
               type="password"
@@ -129,9 +141,9 @@ const Signup = () => {
               required
               style={{ textAlign: "center", letterSpacing: "8px" }}
             />
-            <small style={{ 
-              color: "var(--text-secondary)", 
-              marginTop: "8px", 
+            <small style={{
+              color: "var(--text-secondary)",
+              marginTop: "8px",
               display: "block",
               fontSize: "12px"
             }}>
@@ -139,23 +151,27 @@ const Signup = () => {
             </small>
           </div>
 
+          {/* Message */}
           {msg && (
-            <div style={{ 
-              background: msg.includes("success") ? 
-                "rgba(16, 185, 129, 0.1)" : "rgba(239, 68, 68, 0.1)", 
-              color: msg.includes("success") ? "var(--success)" : "var(--error)", 
-              padding: "12px", 
+            <div style={{
+              background: msg.includes("success")
+                ? "rgba(16, 185, 129, 0.1)"
+                : "rgba(239, 68, 68, 0.1)",
+              color: msg.includes("success") ? "var(--success)" : "var(--error)",
+              padding: "12px",
               borderRadius: "12px",
               marginBottom: "16px",
-              border: `1px solid ${msg.includes("success") ? 
-                "rgba(16, 185, 129, 0.2)" : "rgba(239, 68, 68, 0.2)"}`
+              border: `1px solid ${msg.includes("success")
+                ? "rgba(16, 185, 129, 0.2)"
+                : "rgba(239, 68, 68, 0.2)"}`
             }}>
               {msg.replace(/^(success|error):\s*/, "")}
             </div>
           )}
 
-          <button 
-            type="submit" 
+          {/* Submit */}
+          <button
+            type="submit"
             className="btn btn-primary"
             style={{ width: "100%" }}
             disabled={isLoading}
@@ -164,15 +180,16 @@ const Signup = () => {
           </button>
         </form>
 
+        {/* Footer */}
         <div style={{ textAlign: "center", marginTop: "24px" }}>
           <p style={{ color: "var(--text-secondary)" }}>
             Already have an account?{" "}
-            <Link 
-              to="/login" 
-              style={{ 
-                color: "var(--primary-light)", 
-                textDecoration: "none", 
-                fontWeight: "600" 
+            <Link
+              to="/login"
+              style={{
+                color: "var(--primary-light)",
+                textDecoration: "none",
+                fontWeight: "600"
               }}
             >
               Sign in here
