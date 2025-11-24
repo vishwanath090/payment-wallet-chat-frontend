@@ -9,7 +9,6 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
 
-  const [isOpen, setIsOpen] = useState(false);
   const [hoveredItem, setHoveredItem] = useState(null);
 
   // Navigation items with colors
@@ -32,7 +31,6 @@ const Navbar = () => {
 
   const handleNavClick = (path) => {
     navigate(path);
-    setIsOpen(false);
   };
 
   const handleLogout = () => {
@@ -42,22 +40,7 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Glass overlay when menu opens */}
-      {isOpen && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.4)",
-            backdropFilter: "blur(6px)",
-            zIndex: 999,
-            animation: "fadeIn 0.3s ease",
-          }}
-          onClick={() => setIsOpen(false)}
-        />
-      )}
-
-      {/* Floating Glass Navbar */}
+      {/* Floating Glass Navbar - Vertical Bar */}
       <nav
         style={{
           position: "fixed",
@@ -66,9 +49,10 @@ const Navbar = () => {
           zIndex: 1000,
           background: "rgba(255, 255, 255, 0.08)",
           backdropFilter: "blur(30px) saturate(200%)",
-          borderRadius: "24px",
-          padding: "12px 16px",
+          borderRadius: "20px",
+          padding: "16px 12px",
           display: "flex",
+          flexDirection: "column",
           alignItems: "center",
           gap: "12px",
           transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -81,174 +65,182 @@ const Navbar = () => {
           `,
         }}
       >
-        {/* Elegant Menu Toggle Button */}
+        {/* Home Button */}
         <button
-          onClick={() => setIsOpen(!isOpen)}
-          onMouseEnter={() => setHoveredItem('menu')}
+          onClick={() => handleNavClick("/dashboard")}
+          onMouseEnter={() => setHoveredItem('home')}
           onMouseLeave={() => setHoveredItem(null)}
           style={{
-            background: "linear-gradient(135deg, rgba(139, 92, 246, 0.9), rgba(59, 130, 246, 0.9))",
-            width: "52px",
-            height: "52px",
+            background: location.pathname === "/dashboard" 
+              ? "linear-gradient(135deg, rgba(139, 92, 246, 0.9), rgba(99, 102, 241, 0.9))"
+              : hoveredItem === 'home'
+              ? "linear-gradient(135deg, rgba(139, 92, 246, 0.7), rgba(99, 102, 241, 0.7))"
+              : "rgba(255, 255, 255, 0.08)",
+            width: "60px",
+            height: "60px",
             borderRadius: "16px",
-            border: "1px solid rgba(255, 255, 255, 0.25)",
+            border: location.pathname === "/dashboard" 
+              ? "1px solid rgba(255, 255, 255, 0.4)"
+              : "1px solid rgba(255, 255, 255, 0.15)",
             color: "white",
             fontSize: "22px",
             cursor: "pointer",
             display: "flex",
+            flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
+            gap: "4px",
             transition: "all 0.3s ease",
-            transform: isOpen ? "rotate(90deg)" : hoveredItem === 'menu' ? "scale(1.05)" : "scale(1)",
-            boxShadow: isOpen 
-              ? "0 8px 25px rgba(139, 92, 246, 0.5)" 
-              : "0 6px 20px rgba(139, 92, 246, 0.3)",
-            filter: hoveredItem === 'menu' ? "brightness(1.1)" : "brightness(1)",
+            transform: hoveredItem === 'home' ? "translateY(-2px) scale(1.05)" : "scale(1)",
+            boxShadow: location.pathname === "/dashboard"
+              ? "0 8px 25px rgba(139, 92, 246, 0.4)"
+              : hoveredItem === 'home'
+              ? "0 6px 20px rgba(139, 92, 246, 0.3)"
+              : "0 4px 15px rgba(0, 0, 0, 0.1)",
+            backdropFilter: "blur(20px)",
           }}
         >
-          {isOpen ? "✕" : "☰"}
+          <div style={{ 
+            fontSize: "20px",
+            filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.2))",
+            transition: "all 0.3s ease",
+            transform: hoveredItem === 'home' ? "scale(1.1)" : "scale(1)",
+          }}>
+            🏠
+          </div>
+          <span style={{ 
+            fontSize: "10px", 
+            fontWeight: "600",
+            letterSpacing: "0.3px",
+            textShadow: "0 1px 2px rgba(0,0,0,0.3)",
+          }}>
+            Home
+          </span>
         </button>
 
-        {/* Glass Menu Items */}
-        {isOpen && (
+        {/* History Button */}
+        <button
+          onClick={() => handleNavClick("/history")}
+          onMouseEnter={() => setHoveredItem('history')}
+          onMouseLeave={() => setHoveredItem(null)}
+          style={{
+            background: location.pathname === "/history" 
+              ? "linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(37, 99, 235, 0.9))"
+              : hoveredItem === 'history'
+              ? "linear-gradient(135deg, rgba(59, 130, 246, 0.7), rgba(37, 99, 235, 0.7))"
+              : "rgba(255, 255, 255, 0.08)",
+            width: "60px",
+            height: "60px",
+            borderRadius: "16px",
+            border: location.pathname === "/history" 
+              ? "1px solid rgba(255, 255, 255, 0.4)"
+              : "1px solid rgba(255, 255, 255, 0.15)",
+            color: "white",
+            fontSize: "22px",
+            cursor: "pointer",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "4px",
+            transition: "all 0.3s ease",
+            transform: hoveredItem === 'history' ? "translateY(-2px) scale(1.05)" : "scale(1)",
+            boxShadow: location.pathname === "/history"
+              ? "0 8px 25px rgba(59, 130, 246, 0.4)"
+              : hoveredItem === 'history'
+              ? "0 6px 20px rgba(59, 130, 246, 0.3)"
+              : "0 4px 15px rgba(0, 0, 0, 0.1)",
+            backdropFilter: "blur(20px)",
+          }}
+        >
           <div style={{ 
-            display: "flex", 
-            gap: "12px",
-            animation: "slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+            fontSize: "20px",
+            filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.2))",
+            transition: "all 0.3s ease",
+            transform: hoveredItem === 'history' ? "scale(1.1)" : "scale(1)",
           }}>
-            {navItems.map((item) => (
-              <button
-                key={item.path}
-                onClick={() => handleNavClick(item.path)}
-                onMouseEnter={() => setHoveredItem(item.path)}
-                onMouseLeave={() => setHoveredItem(null)}
-                style={{
-                  background: location.pathname === item.path 
-                    ? item.gradient
-                    : hoveredItem === item.path
-                    ? `linear-gradient(135deg, ${item.color}, rgba(255,255,255,0.12))`
-                    : "rgba(255, 255, 255, 0.08)",
-                  padding: "14px 18px",
-                  borderRadius: "18px",
-                  border: location.pathname === item.path 
-                    ? "1px solid rgba(255, 255, 255, 0.4)"
-                    : "1px solid rgba(255, 255, 255, 0.15)",
-                  color: "white",
-                  cursor: "pointer",
-                  transition: "all 0.3s ease",
-                  minWidth: "100px",
-                  minHeight: "65px",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: "6px",
-                  backdropFilter: "blur(20px)",
-                  transform: hoveredItem === item.path ? "translateY(-2px)" : "translateY(0)",
-                  boxShadow: location.pathname === item.path
-                    ? `0 12px 30px ${item.color.replace('0.8', '0.25')}`
-                    : hoveredItem === item.path
-                    ? `0 8px 25px ${item.color.replace('0.8', '0.15')}`
-                    : "0 4px 15px rgba(0, 0, 0, 0.1)",
-                }}
-              >
-                <div style={{ 
-                  fontSize: "22px",
-                  filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.2))",
-                  transition: "all 0.3s ease",
-                  transform: hoveredItem === item.path ? "scale(1.15)" : "scale(1)",
-                }}>
-                  {item.icon}
-                </div>
-                <span style={{ 
-                  fontSize: "12px", 
-                  fontWeight: "600",
-                  letterSpacing: "0.3px",
-                  textShadow: "0 1px 2px rgba(0,0,0,0.3)",
-                }}>
-                  {item.label}
-                </span>
-              </button>
-            ))}
-
-            {/* Glass Logout Button */}
-            <button
-              onClick={handleLogout}
-              onMouseEnter={() => setHoveredItem('logout')}
-              onMouseLeave={() => setHoveredItem(null)}
-              style={{
-                background: hoveredItem === 'logout'
-                  ? "linear-gradient(135deg, rgba(239, 68, 68, 0.9), rgba(220, 38, 38, 0.9))"
-                  : "rgba(239, 68, 68, 0.7)",
-                padding: "14px 18px",
-                borderRadius: "18px",
-                border: "1px solid rgba(255, 255, 255, 0.2)",
-                color: "white",
-                cursor: "pointer",
-                transition: "all 0.3s ease",
-                minWidth: "100px",
-                minHeight: "65px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "6px",
-                backdropFilter: "blur(20px)",
-                transform: hoveredItem === 'logout' ? "translateY(-2px)" : "translateY(0)",
-                boxShadow: hoveredItem === 'logout'
-                  ? "0 8px 25px rgba(239, 68, 68, 0.3)"
-                  : "0 4px 15px rgba(239, 68, 68, 0.15)",
-              }}
-            >
-              <div style={{ 
-                fontSize: "22px",
-                filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.2))",
-                transition: "all 0.3s ease",
-                transform: hoveredItem === 'logout' ? "scale(1.15)" : "scale(1)",
-              }}>
-                🚪
-              </div>
-              <span style={{ 
-                fontSize: "12px", 
-                fontWeight: "600",
-                letterSpacing: "0.3px",
-                textShadow: "0 1px 2px rgba(0,0,0,0.3)",
-              }}>
-                Logout
-              </span>
-            </button>
+            📊
           </div>
-        )}
+          <span style={{ 
+            fontSize: "10px", 
+            fontWeight: "600",
+            letterSpacing: "0.3px",
+            textShadow: "0 1px 2px rgba(0,0,0,0.3)",
+          }}>
+            History
+          </span>
+        </button>
+
+        {/* Separator Line */}
+        <div style={{
+          width: "40px",
+          height: "1px",
+          background: "rgba(255, 255, 255, 0.2)",
+          margin: "4px 0",
+          borderRadius: "1px",
+        }} />
+
+        {/* Logout Button */}
+        <button
+          onClick={handleLogout}
+          onMouseEnter={() => setHoveredItem('logout')}
+          onMouseLeave={() => setHoveredItem(null)}
+          style={{
+            background: hoveredItem === 'logout'
+              ? "linear-gradient(135deg, rgba(239, 68, 68, 0.9), rgba(220, 38, 38, 0.9))"
+              : "rgba(239, 68, 68, 0.7)",
+            width: "60px",
+            height: "60px",
+            borderRadius: "16px",
+            border: "1px solid rgba(255, 255, 255, 0.2)",
+            color: "white",
+            fontSize: "22px",
+            cursor: "pointer",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "4px",
+            transition: "all 0.3s ease",
+            transform: hoveredItem === 'logout' ? "translateY(-2px) scale(1.05)" : "scale(1)",
+            boxShadow: hoveredItem === 'logout'
+              ? "0 6px 20px rgba(239, 68, 68, 0.4)"
+              : "0 4px 15px rgba(239, 68, 68, 0.2)",
+            backdropFilter: "blur(20px)",
+          }}
+        >
+          <div style={{ 
+            fontSize: "20px",
+            filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.2))",
+            transition: "all 0.3s ease",
+            transform: hoveredItem === 'logout' ? "scale(1.1)" : "scale(1)",
+          }}>
+            🚪
+          </div>
+          <span style={{ 
+            fontSize: "10px", 
+            fontWeight: "600",
+            letterSpacing: "0.3px",
+            textShadow: "0 1px 2px rgba(0,0,0,0.3)",
+          }}>
+            Logout
+          </span>
+        </button>
       </nav>
 
       <style>
         {`
-          @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-          }
-
-          @keyframes slideIn {
-            from {
-              opacity: 0;
-              transform: translateX(15px);
-            }
-            to {
-              opacity: 1;
-              transform: translateX(0);
-            }
-          }
-
           /* Mobile responsiveness */
           @media (max-width: 768px) {
             nav {
               top: 15px;
               right: 15px;
-              padding: 10px 14px;
+              padding: 12px 10px;
             }
             
-            nav > div {
-              flex-direction: column;
-              max-height: 60vh;
-              overflow-y: auto;
+            button {
+              width: 55px;
+              height: 55px;
             }
           }
         `}
