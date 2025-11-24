@@ -60,14 +60,21 @@ const Signup = () => {
         justifyContent: "center",
         alignItems: "center",
         minHeight: "100vh",
-        padding: "20px"
+        padding: "20px",
+        backgroundColor: "#f8fafc"
       }}
     >
       <div className="glass-card"
         style={{
           maxWidth: "400px",
           width: "100%",
-          textAlign: "center"
+          textAlign: "center",
+          background: "rgba(255, 255, 255, 0.95)",
+          backdropFilter: "blur(10px)",
+          borderRadius: "20px",
+          padding: "32px",
+          boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
+          border: "1px solid rgba(255, 255, 255, 0.2)"
         }}
       >
 
@@ -77,24 +84,24 @@ const Signup = () => {
             style={{
               width: "80px",
               height: "80px",
-              background: "linear-gradient(135deg, var(--secondary), #34D399)",
+              background: "linear-gradient(135deg, #667eea, #764ba2)",
               borderRadius: "20px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               fontSize: "32px",
               margin: "0 auto 16px",
-              boxShadow: "0 8px 32px rgba(6, 214, 160, 0.3)"
+              boxShadow: "0 8px 32px rgba(102, 126, 234, 0.3)"
             }}
           >
             👤
           </div>
 
-          <h1 style={{ fontSize: "28px", fontWeight: "700", marginBottom: "8px" }}>
+          <h1 style={{ fontSize: "28px", fontWeight: "700", marginBottom: "8px", color: "#1e293b" }}>
             Join WalletPay
           </h1>
 
-          <p style={{ color: "var(--text-secondary)" }}>
+          <p style={{ color: "#64748b", fontSize: "14px" }}>
             Create your digital wallet
           </p>
         </div>
@@ -103,54 +110,90 @@ const Signup = () => {
         <form onSubmit={handleSignup}>
           
           {/* Full Name */}
-          <div className="form-group">
+          <div style={{ marginBottom: "16px" }}>
             <input
               name="fullName"
               value={formData.fullName}
               onChange={handleChange}
-              className="form-input"
               placeholder="Full Name"
               required
               autoComplete="off"
               spellCheck="false"
-              style={{ textAlign: "center" }}
+              style={{ 
+                textAlign: "center",
+                width: "100%",
+                padding: "12px 16px",
+                border: "1px solid #e2e8f0",
+                borderRadius: "12px",
+                fontSize: "16px",
+                backgroundColor: "white",
+                boxSizing: "border-box",
+                outline: "none",
+                transition: "all 0.2s ease"
+              }}
+              onFocus={(e) => e.target.style.borderColor = "#667eea"}
+              onBlur={(e) => e.target.style.borderColor = "#e2e8f0"}
             />
           </div>
 
           {/* Email */}
-          <div className="form-group">
+          <div style={{ marginBottom: "16px" }}>
             <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="form-input"
               placeholder="Email Address"
               required
               autoComplete="email"
               spellCheck="false"
-              style={{ textAlign: "center" }}
+              style={{ 
+                textAlign: "center",
+                width: "100%",
+                padding: "12px 16px",
+                border: "1px solid #e2e8f0",
+                borderRadius: "12px",
+                fontSize: "16px",
+                backgroundColor: "white",
+                boxSizing: "border-box",
+                outline: "none",
+                transition: "all 0.2s ease"
+              }}
+              onFocus={(e) => e.target.style.borderColor = "#667eea"}
+              onBlur={(e) => e.target.style.borderColor = "#e2e8f0"}
             />
           </div>
 
           {/* Password */}
-          <div className="form-group">
+          <div style={{ marginBottom: "16px" }}>
             <input
               type="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className="form-input"
               placeholder="Create Password"
               required
               autoComplete="new-password"
               spellCheck="false"
-              style={{ textAlign: "center" }}
+              style={{ 
+                textAlign: "center",
+                width: "100%",
+                padding: "12px 16px",
+                border: "1px solid #e2e8f0",
+                borderRadius: "12px",
+                fontSize: "16px",
+                backgroundColor: "white",
+                boxSizing: "border-box",
+                outline: "none",
+                transition: "all 0.2s ease"
+              }}
+              onFocus={(e) => e.target.style.borderColor = "#667eea"}
+              onBlur={(e) => e.target.style.borderColor = "#e2e8f0"}
             />
           </div>
 
           {/* PIN */}
-          <div className="form-group">
+          <div style={{ marginBottom: "24px" }}>
             <input
               type="password"
               name="pin"
@@ -158,18 +201,28 @@ const Signup = () => {
               maxLength={4}
               onChange={handleChange}
               placeholder="4-digit Security PIN"
-              className="form-input"
               required
               autoComplete="off"
               inputMode="numeric"
               style={{
                 textAlign: "center",
-                letterSpacing: "8px"
+                letterSpacing: "8px",
+                width: "100%",
+                padding: "12px 16px",
+                border: "1px solid #e2e8f0",
+                borderRadius: "12px",
+                fontSize: "16px",
+                backgroundColor: "white",
+                boxSizing: "border-box",
+                outline: "none",
+                transition: "all 0.2s ease"
               }}
+              onFocus={(e) => e.target.style.borderColor = "#667eea"}
+              onBlur={(e) => e.target.style.borderColor = "#e2e8f0"}
             />
             <small
               style={{
-                color: "var(--text-secondary)",
+                color: "#64748b",
                 marginTop: "8px",
                 display: "block",
                 fontSize: "12px"
@@ -186,7 +239,7 @@ const Signup = () => {
                 background: msg.includes("success")
                   ? "rgba(16, 185, 129, 0.1)"
                   : "rgba(239, 68, 68, 0.1)",
-                color: msg.includes("success") ? "var(--success)" : "var(--error)",
+                color: msg.includes("success") ? "#10b981" : "#ef4444",
                 padding: "12px",
                 borderRadius: "12px",
                 marginBottom: "16px",
@@ -194,7 +247,8 @@ const Signup = () => {
                   msg.includes("success")
                     ? "rgba(16, 185, 129, 0.2)"
                     : "rgba(239, 68, 68, 0.2)"
-                }`
+                }`,
+                fontSize: "14px"
               }}
             >
               {msg.replace(/^(success|error):\s*/, "")}
@@ -204,9 +258,22 @@ const Signup = () => {
           {/* Submit */}
           <button
             type="submit"
-            className="btn btn-primary"
-            style={{ width: "100%" }}
+            style={{ 
+              width: "100%",
+              padding: "14px 16px",
+              backgroundColor: "#667eea",
+              color: "white",
+              border: "none",
+              borderRadius: "12px",
+              fontSize: "16px",
+              fontWeight: "600",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+              marginBottom: "16px"
+            }}
             disabled={isLoading}
+            onMouseOver={(e) => !isLoading && (e.target.style.backgroundColor = "#5a6fd8")}
+            onMouseOut={(e) => !isLoading && (e.target.style.backgroundColor = "#667eea")}
           >
             {isLoading ? "⏳ Creating Account..." : "🎉 Create Account"}
           </button>
@@ -214,12 +281,12 @@ const Signup = () => {
 
         {/* Footer */}
         <div style={{ textAlign: "center", marginTop: "24px" }}>
-          <p style={{ color: "var(--text-secondary)" }}>
+          <p style={{ color: "#64748b", fontSize: "14px" }}>
             Already have an account?{" "}
             <Link
               to="/login"
               style={{
-                color: "var(--primary-light)",
+                color: "#667eea",
                 textDecoration: "none",
                 fontWeight: "600"
               }}
