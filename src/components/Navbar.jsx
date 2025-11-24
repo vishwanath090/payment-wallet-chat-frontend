@@ -1,110 +1,145 @@
 // components/Navbar.js
 import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "./context/AuthContext";
 
 const Navbar = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { logout } = useAuth();
-
   const [isOpen, setIsOpen] = useState(false);
 
-  // Simple navigation click
-  const go = (path) => {
-    navigate(path);
+  const navigateTo = (path) => {
+    if (path === "logout") {
+      // Simple logout - clear storage and redirect
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login";
+      return;
+    }
+    
+    // Simple navigation using window.location
+    window.location.href = path;
     setIsOpen(false);
   };
 
   return (
     <>
-      {/* Background overlay when menu is open */}
       {isOpen && (
         <div
-          onClick={() => setIsOpen(false)}
           style={{
             position: "fixed",
-            inset: 0,
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
             background: "rgba(0,0,0,0.45)",
-            backdropFilter: "blur(4px)",
             zIndex: 900,
+            backdropFilter: "blur(4px)",
           }}
+          onClick={() => setIsOpen(false)}
         />
       )}
 
-      {/* SIMPLE FIXED TOP-RIGHT NAVBAR */}
       <nav
         style={{
           position: "fixed",
           top: "20px",
           right: "20px",
-          zIndex: 1000,
           background: "rgba(255,255,255,0.15)",
           backdropFilter: "blur(20px)",
-          padding: "16px",
-          borderRadius: "20px",
+          border: "1px solid rgba(255,255,255,0.3)",
+          borderRadius: "25px",
+          padding: "16px 20px",
           display: "flex",
+          alignItems: "center",
           gap: "12px",
-          transition: "all 0.3s ease",
+          zIndex: 1000,
+          boxShadow: "0 20px 40px rgba(0, 0, 0, 0.3)",
         }}
       >
-        {/* MENU BUTTON */}
         <button
           onClick={() => setIsOpen(!isOpen)}
           style={{
-            background: "linear-gradient(135deg,#8b5cf6,#3b82f6)",
-            width: "52px",
-            height: "52px",
+            width: "56px",
+            height: "56px",
             borderRadius: "50%",
             border: "none",
-            fontSize: "22px",
+            fontSize: "24px",
             color: "white",
             cursor: "pointer",
+            background: "linear-gradient(135deg,#8b5cf6,#3b82f6)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            transition: "all 0.3s ease",
+            transform: isOpen ? "rotate(90deg)" : "rotate(0)",
           }}
         >
           {isOpen ? "✕" : "☰"}
         </button>
 
-        {/* MENU ITEMS */}
         {isOpen && (
-          <div style={{ display: "flex", gap: "10px" }}>
+          <div style={{ 
+            display: "flex", 
+            gap: "12px",
+          }}>
             <button
-              onClick={() => go("/dashboard")}
+              onClick={() => navigateTo("/dashboard")}
               style={{
                 background: "rgba(255,255,255,0.2)",
-                padding: "10px 14px",
-                borderRadius: "14px",
-                border: "1px solid rgba(255,255,255,0.3)",
+                padding: "14px 16px",
+                borderRadius: "18px",
                 color: "white",
+                border: "1px solid rgba(255,255,255,0.3)",
+                cursor: "pointer",
+                minWidth: "100px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "6px",
+                backdropFilter: "blur(10px)",
               }}
             >
-              🏠 Home
+              <span style={{ fontSize: "20px" }}>🏠</span>
+              <span style={{ fontSize: "11px", fontWeight: "600" }}>Home</span>
             </button>
 
             <button
-              onClick={() => go("/history")}
+              onClick={() => navigateTo("/history")}
               style={{
                 background: "rgba(255,255,255,0.2)",
-                padding: "10px 14px",
-                borderRadius: "14px",
-                border: "1px solid rgba(255,255,255,0.3)",
+                padding: "14px 16px",
+                borderRadius: "18px",
                 color: "white",
+                border: "1px solid rgba(255,255,255,0.3)",
+                cursor: "pointer",
+                minWidth: "100px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "6px",
+                backdropFilter: "blur(10px)",
               }}
             >
-              📊 History
+              <span style={{ fontSize: "20px" }}>📊</span>
+              <span style={{ fontSize: "11px", fontWeight: "600" }}>History</span>
             </button>
 
             <button
-              onClick={logout}
+              onClick={() => navigateTo("logout")}
               style={{
-                background: "rgba(239,68,68,0.85)",
-                padding: "10px 14px",
-                borderRadius: "14px",
-                border: "none",
+                background: "rgba(239,68,68,0.8)",
+                padding: "14px 16px",
+                borderRadius: "18px",
                 color: "white",
+                border: "1px solid rgba(255,255,255,0.3)",
+                cursor: "pointer",
+                minWidth: "100px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "6px",
+                backdropFilter: "blur(10px)",
               }}
             >
-              🚪 Logout
+              <span style={{ fontSize: "20px" }}>🚪</span>
+              <span style={{ fontSize: "11px", fontWeight: "600" }}>Logout</span>
             </button>
           </div>
         )}
